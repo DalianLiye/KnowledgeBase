@@ -18,7 +18,7 @@
 
 #### Example
 
-```seq
+```mermaid
 A->B: Message
 B->C: Message
 C->A: Message
