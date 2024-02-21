@@ -1,4 +1,10 @@
-<table><tr><td bgcolor=green>背景色yellow</td></tr></table>
+```diff
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
+```
 
 ```mermaid
 %% graph TD; comment
