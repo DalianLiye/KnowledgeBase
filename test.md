@@ -1,3 +1,5 @@
+<table><tr><td bgcolor=green>背景色yellow</td></tr></table>
+
 ```mermaid
 %% graph TD; comment
 graph LR
