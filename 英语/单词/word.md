@@ -10,3 +10,7 @@
 
 - be under the impression that\
 我印象里(事实跟印象里不一致)
+
+
+- go through\
+  Let's quickly go through the contents of the contract
