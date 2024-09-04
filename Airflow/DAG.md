@@ -1,5 +1,5 @@
 # 关于DAG
-DAG全称：Directed Acyclic Graph （向无环图）, 它是 Airflow的核心概念
+DAG全称：Directed Acyclic Graph （向无环图）, 它是 Airflow的核心概念\
 DAG包含了一组task的集合，DAG中定义了如何运行集合中的task，比如task的执行顺序，各task执行前后的依赖关系
 不包含任何task的DAG毫无意义
 
