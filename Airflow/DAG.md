@@ -394,7 +394,7 @@ task4是task1和task2的下游，但它不会被跳过，因为它的trigger_rul
 
 ## Depends On Past
 只有当上一个DAG RUN中的该task的task instance成功运行后，该task才能运行
-
+**示例：**
 ```python
 task01 = EmptyOperator(task_id="task01", depends_on_past=true,dag=dag)
 ```
@@ -423,7 +423,7 @@ trigger_rule有以下选项：
 
 还可以将其与Depends On Past功能结合使用
 
-注：
+**注：**\
 了解Trigger Rules与skipped tasks之间的交互非常重要，尤其是作为分支操作的一部分而被跳过的task\
 分支操作的所有下游分支task一般不会使用all_success或all_failed\
 因为既然是分支，那么只能有一个或多个分支会往下走，剩下的分支就是skipped，如果下游都是all_success或all_failed，那么就都skipped了
