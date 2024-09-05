@@ -1,9 +1,9 @@
 # 关于DAG
 DAG全称：Directed Acyclic Graph （向无环图）, 它是 Airflow的核心概念\
-DAG包含了一组task的集合，DAG中定义了如何运行集合中的task，比如task的执行顺序，各task执行前后的依赖关系\
-不包含任何task的DAG毫无意义
+DAG包含了一组task的集合，DAG中定义了如何运行集合中的task，比如各task之间的执行顺序，以及执行前后的依赖关系\
+一个DAG如果不包含任何task将毫无意义
 
-DAG中包含的task包含以下种类：
+DAG中的task包含以下种类：
 - Operators
 - Sensors
 - TaskFlow
@@ -28,7 +28,7 @@ DAG仅仅是一个调度工具，它并不关心task的具体内容，只关心t
      EmptyOperator(task_id="task")
 ```
 
-- **方式2：** 使用标准构造函数，将DAG传递给使用的任何运算符
+- **方式2：** 使用标准构造函数，将DAG传递给使用的任何operator/task
 ```python
  import datetime
  from airflow import DAG
@@ -56,7 +56,7 @@ generate_dag()
 ```
 
 # Task依赖
-DAG里通常不会只有一个task，它会定义多个task，而各task之间通常也是有依赖关系的
+DAG里通常会定义多个task，而各task之间通常也是有依赖关系的
 
 Task之间依赖关系的定义主要有以下两种方式：
 - **方式1：** 使用操作符>>和<<(推荐)
@@ -112,9 +112,9 @@ Airflow通过加载python源文件来加载DAG，这些python源文件被放置�
 Airflow会获取DAG_FOLDER下的每个文件后并执行它，然后从该文件中加载所有DAG对象\
 因此一个python文件可定义多个DAG，也一个DAG也可使用多个python文件(通过import方式整合)
 
-Airflow从Python文件加载DAG时，它只会提取顶级的任何DAG对象(DAG实例)
+Airflow从Python文件加载DAG时，它只会提取顶级（global域）的任何DAG对象(DAG实例)
 
-**示例:**
+**示例:**\
 dag_1会被加载，dag_1定义在顶层(globals,即定义在全局域)\
 dag_2不会被加载，dag_1定义方法内部(local，即定义在局部)
 ```python
@@ -126,11 +126,11 @@ def my_function():
 my_function()
 ```
 
-**注：**
+**注：**\
 Airflow在DAG_FOLDER中搜索DAG时，Airflow仅将包含字符串airflow和dag（不区分大小写）的Python文件作为优化项考虑在内\
 要考虑所有Python文件，请禁用DAG_DISCOVERY_SAFE_MODE配置标志
 
-可以在DAG_FOLDER或其任何子文件夹中提供一个 .airflowignore文件，该文件描述了加载器要忽略的文件模式，它涵盖了它所在的目录以及其下的所有子文件夹
+可以在DAG_FOLDER或其任何子文件夹中提供一个 .airflowignore文件，该文件描述了加载器要忽略的文件模式，它涵盖了它所在的目录以及其所有子文件夹
 
 当.airflowignore无法满足需求，并且希望以更灵活的方式控制Airflow是否需要解析Python文件时，可通过在配置文件中设置might_contain_dag_callable来插入可调用项\
 该可调用项将替换默认的Airflow启发式方法，即检查Python文件中是否存在字符串airflow和dag（不区分大小写）
@@ -168,11 +168,11 @@ with DAG("my_continuous_dag", schedule="@continuous"):
 
 ## DAG RUN
 DAG每次的执行表示一个DAG RUN\
-同一个DAG的多个DAG RUN可以并行，每一个DAG RUN都有自己定义的数据间隔，用于标识DAG Task应操作的数据周期
+同一个DAG的多个DAG RUN可以并行执行，每一个DAG RUN都有自己定义的数据间隔，用于标识DAG RUN里task应操作的数据周期
 
-比如有一个DAG每天都会处理当天的数据，此时DAG的内部逻辑发生改变，需要用新的逻辑重新处理过去三个月的数据\
-此种情况，可以通过回填DAG解决，即重新执行过去三个月里该DAG每天的DAG RUN\
-因为过去三个月里每天的DAG RUN都只处理其所在当天数据周期的数据，每天的DAG RUN之间不会相互影响，可以在同一时间点执行这些历史三个月里每天的DAG RUN
+比如有一个DAG每天都会处理上游在当天的数据，此时DAG的内部逻辑发生改变，需要用新的逻辑重新处理过去三个月的数据\
+此种情况，可以通过回填DAG解决，即重新执行该DAG在过去三个月里的每一天的DAG RUN\
+因为过去三个月里每一天的DAG RUN都只处理其所在当天数据周期的数据，每天的DAG RUN之间不会相互影响，因此可以在同一时间点执行这些历史三个月里每天的DAG RUN
 
 DAG每次的执行表示一个DAG RUN，DAG中task每次的执行表示一个task instance
 
@@ -181,8 +181,8 @@ DAG RUN有以下三个时间：
 - **end date：** DAG RUN实际的结束时间
 - **logical date（正式称为execution date）：** DAG RUN计划或触发的预期时间，之所以将其称为logical date，是因为它具有抽象的本质，具有多种含义，具体取决于 DAG 运行本身的上下文
 
-当DAG RUN是手动触发，则其logical date将为触发DAG RUN的日期和时间，并且该值应等于DAG RUN的start date
-当DAG RUN是被按照预定时间自动调度触发，并设置了特定的调度间隔，则其logical date将指示它标记数据间隔开始的时间，其中DAG RUN的start date将是logical date + 调度间隔\
+当DAG RUN是手动触发，则其logical date将为触发DAG RUN的日期和时间，并且该值应等于DAG RUN的start date\
+当DAG RUN是被按照预定时间自动调度触发，并设置了特定的调度间隔，则其logical date将指示它标记数据间隔开始的时间，其中DAG RUN的start date将是logical date + 调度间隔
 
 
 
@@ -472,8 +472,9 @@ branching >> branch_false >> join
 ```
 
 
-
-
+## 设置和拆除
+在数据工作流中，通常会创建资源（例如计算资源），使用它来完成一些工作，然后将其拆除\
+Airflow提供设置和拆除task来支持此需求
 
 
 
