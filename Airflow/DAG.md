@@ -477,6 +477,177 @@ branching >> branch_false >> join
 Airflow提供设置和拆除task来支持此需求
 
 
+# 动态DAG
+由于DAG由Python代码定义，因此无需使其完全声明性，可以自由使用循环、函数等来定义DAG\
+一般来说，建议尝试保持DAG task的拓扑（布局）相对稳定，动态DAG通常更适合用于动态加载配置选项\
+也就是说，不要使用动态DAG的方式，轻易改变task和task之间的前后顺序关系，更适合动态修改task的配置项
+
+**示例：**\
+使用 for 循环来定义一些任务的DAG
+```python
+ with DAG("loop_example", ...):
+     first = EmptyOperator(task_id="first")
+     last = EmptyOperator(task_id="last")
+
+     options = ["branch_a", "branch_b", "branch_c", "branch_d"]
+     for option in options:
+         t = EmptyOperator(task_id=option)
+         first >> t >> last 
+```
+
+
+# DAG可视化
+通过以下方式查看DAG可视化：
+- 加载Airflow UI，导航指定DAG，选择"Graph"
+- 通过cli运行命令airflow dags show，它会将其呈现为图像文件
+
+通常建议使用图形视图，因为它还会显示所选DAG运行中所有任务实例的状态
+随着开发DAG，它们会变得越来越复杂，因此提供了一些方法来修改这些DAG视图，以便更易于理解
+
+
+## Task Group（任务组）
+Task Group可用于在图形视图中将Task组织成层次组，主要用于创建重复模式和减少视觉混乱
+
+与子DAG不同，Task Group纯粹是UI分组概念\
+task group中的task位于同一原始DAG上，并遵循所有DAG设置和池配置
+
+依赖关系可以使用>>和<<操作符应用到task group中的所有task\
+
+**示例：**\
+以下代码将task1和task2放入任务组group1 中，然后将这两个任务放在task3的上游
+```python
+ from airflow.decorators import task_group
+
+
+ @task_group()
+ def group1():
+     task1 = EmptyOperator(task_id="task1")
+     task2 = EmptyOperator(task_id="task2")
+
+
+ task3 = EmptyOperator(task_id="task3")
+
+ group1() >> task3
+```
+
+**示例：**\
+TaskGroup也支持 default_args，类似于DAG，它将覆盖DAG级别中的default_args
+```python
+import datetime
+
+from airflow import DAG
+from airflow.decorators import task_group
+from airflow.operators.bash import BashOperator
+from airflow.operators.empty import EmptyOperator
+
+with DAG(
+    dag_id="dag1",
+    start_date=datetime.datetime(2016, 1, 1),
+    schedule="@daily",
+    default_args={"retries": 1},
+):
+
+    @task_group(default_args={"retries": 3})
+    def group1():
+        """This docstring will become the tooltip for the TaskGroup."""
+        task1 = EmptyOperator(task_id="task1")
+        task2 = BashOperator(task_id="task2", bash_command="echo Hello World!", retries=2)
+        print(task1.retries)  # 3
+        print(task2.retries)  # 2
+```
+
+**注:**
+- 默认情况下，子task/TaskGroup的ID以其父TaskGroup的group_id为前缀，这有助于确保整个DAG中group_id和task_id 的唯一性\
+ 要禁用前缀，请在创建TaskGroup时传递prefix_group_id=False，但这样的话，自己将负责确保每个任务和组都有自己唯一的ID
+- 使用@task_group装饰器时，装饰函数的文档字符串将用作UI中的TaskGroup工具提示，但前提是未明确提供tooltip值
+
+
+## Edge Labels（边缘标签）
+可以在图形视图中标记不同任务之间的依赖关系边缘，这对于DAG的分支区域特别有用\
+比如可以在连接下游分支的连线处标记该分支的运行的条件
+
+可以直接使用 >> 和 << 运算符内联添加标签
+```python
+from airflow.utils.edgemodifier import Label
+
+my_task >> Label("When empty") >> other_task
+```
+
+可以将 Label 对象传递给 set_upstream/set_downstream
+```python
+from airflow.utils.edgemodifier import Label
+
+my_task.set_downstream(other_task, Label("When empty"))
+```
+
+**示例：**\
+连接下游分支的连线上打标签
+```python
+with DAG(
+    "example_branch_labels",
+    schedule="@daily",
+    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    catchup=False,
+) as dag:
+    ingest = EmptyOperator(task_id="ingest")
+    analyse = EmptyOperator(task_id="analyze")
+    check = EmptyOperator(task_id="check_integrity")
+    describe = EmptyOperator(task_id="describe_integrity")
+    error = EmptyOperator(task_id="email_error")
+    save = EmptyOperator(task_id="save")
+    report = EmptyOperator(task_id="report")
+
+    ingest >> analyse >> check
+    check >> Label("No errors") >> save >> report
+    check >> Label("Errors found") >> describe >> error >> report
+```
+
+
+# DAG & Task Documentation
+可以向DAG和任务对象添加文档或注释，这些文档或注释在Web界面中可见（DAG的"图形"和"树"，任务的"任务实例详细信息"）
+
+有一组特殊task属性，如果已定义，则会呈现为富文档
+
+| 属性      | 呈现为 |
+| ----------- | ----------- |
+| doc      | 等宽字体       |
+| doc_json      | json       |
+| doc_yaml      | yaml       |
+| doc_md      | markdown       |
+| doc_rst      | reStructuredText   |
+
+
+对于DAG，doc_md是唯一解释的属性\
+对于DAG，它可以包含字符串或对模板文件的引用\
+模板引用由以.md结尾的字符串识别\
+如果提供了相对路径，它将从DAG文件的文件夹开始\
+模板文件必须存在，否则 Airflow将抛出jinja2.exceptions.TemplateNotFound异常
+
+
+如果task是从配置文件动态构建的，可以通过该功能展示task的相关配置
+
+```python
+"""
+### My great DAG
+"""
+import pendulum
+
+dag = DAG(
+    "my_dag",
+    start_date=pendulum.datetime(2021, 1, 1, tz="UTC"),
+    schedule="@daily",
+    catchup=False,
+)
+dag.doc_md = __doc__
+
+t = BashOperator("foo", dag=dag)
+t.doc_md = """\
+#Title"
+Here's a [url](www.airbnb.com)
+"""
+```
+
+
 
 # DAG自动暂停
 DAG可以被设置为自动暂停\
