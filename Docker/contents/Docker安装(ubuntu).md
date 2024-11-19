@@ -107,3 +107,5 @@ sudo journalctl -u docker
 sudo systemctl status docker
 ```
 
+- 常见的镜像网站\
+URL：https://www.coderjia.cn/archives/dba3f94c-a021-468a-8ac6-e840f85867ea
