@@ -5,7 +5,7 @@ git init [directory]
 **说明：**
 在当前目录中初始化新的仓库
 
-<br><br>
+<br>
 
 ```bash
 git init <directory>
@@ -13,7 +13,7 @@ git init <directory>
 **说明：**
 在<directory>目录中初始化一个新的仓库\
 
-<br><br>
+<br>
 
 # git config
 ```bash
@@ -23,7 +23,7 @@ git config --global init.defaultBranch
 查看全局的默认分支设置\
 当执行git init命令时，初始化的git仓库的默认分支就是该分支
 
-<br><br>
+<br>
 
 ```bash
 git config --global init.defaultBranch [branch-name]
@@ -32,7 +32,7 @@ git config --global init.defaultBranch [branch-name]
 更改初始化新仓库时的默认分支名称\
 当执行git init命令时，初始化的git仓库的默认分支就会变成该分支
 
-<br><br>
+<br>
 
 # git clone
 获取一个现有的仓库\
@@ -41,7 +41,7 @@ git config --global init.defaultBranch [branch-name]
 git clone <repo url>
 ```
 
-<br><br>
+<br>
 
 # git branch
 - 查看所有分支
@@ -49,14 +49,14 @@ git clone <repo url>
 git branch
 ```
 
-<br><br>
+<br>
 
 - 创建新的分支
 ```bash
 git branch feature-branch
 ```
 
-<br><br>
+<br>
 
 # git checkout
 
@@ -65,7 +65,7 @@ git branch feature-branch
 git checkout <branch_name>
 ```
 
-<br><br>
+<br>
 
 - 创建并切换到指定分支
 ```bash
@@ -77,7 +77,7 @@ git checkout -b new_branch_name
 git checkout -- filename
 ```
 
-<br><br>
+<br>
 
 # git switch
 创建分支，并切换到该分支
@@ -85,7 +85,7 @@ git checkout -- filename
 git switch -c <branch_name>
 ```
 
-<br><br>
+<br>
 
 # git checkout和git switch的区别
 - 功能专一性：
@@ -104,7 +104,7 @@ git checkout 因其多功能性，易导致用户混淆或误操作
 git switch：当只需要进行分支管理（切换分支或创建新的分支）时，推荐使用 git switch。它具有更清晰的语义，更易于理解和使用\
 git checkout：当需要恢复文件到暂存区或最新提交版本时，需要使用 git checkout。另外，某些情况下如果你使用的是较旧版本的 Git，git switch 可能不可用（Git 2.23 之前没有 git switch）
 
-<br><br>
+<br>
 
 # git status
 ```bash
@@ -113,7 +113,7 @@ git status
 **说明：**
 查看当前仓库状态
 
-<br><br>
+<br>
 
 # git diff
 ```bash
@@ -122,7 +122,7 @@ git diff
 **说明：**
 用于比较Git工作区与暂存区或与其他分支或提交之间的差异\
 
-<br><br>
+<br>
 
 ```bash 
 git diff --staged
@@ -132,7 +132,7 @@ git diff --cached
 **说明：**
 比对暂存区与最新提交之间的差异
 
-<br><br>
+<br>
 
 ```bash
 git diff HEAD 
@@ -140,7 +140,7 @@ git diff HEAD
 **说明：**
 显示工作区与最新提交之间的差异
 
-<br><br>
+<br>
 
 ```bash
 git diff branch1 branch2
@@ -148,7 +148,7 @@ git diff branch1 branch2
 **说明：**
 比较分支之间的差异
 
-<br><br>
+<br>
 
 ```bash
 git diff <commit1> <commit2>
@@ -157,7 +157,7 @@ git diff 6fbf3d8 8f0d3a9 #例
 **说明：**
 比较两个提交之间的差异
 
-<br><br>
+<br>
 
 ```bash
 git diff [options] -- <file>
@@ -171,7 +171,7 @@ git diff commit1 commit2 -- <file>
 **说明：**
 显示特定文件的差异
 
-<br><br>
+<br>
 
 ```bash
 git diff --name-only
@@ -179,7 +179,7 @@ git diff --name-only
 **说明：**
 只显示修改的文件名
 
-<br><br>
+<br>
 
 ```bash
 git diff --name-status
@@ -187,7 +187,7 @@ git diff --name-status
 **说明：**
 显示文件名和文件状态（新增、修改、删除）
 
-<br><br>
+<br>
 
 ```bash
 git diff -p
@@ -198,7 +198,7 @@ git diff --patch
 生成差异补丁格式，这通常是默认选项\
 该格式显示了更详细的、更结构化的差异信息，包括上下文行和修改的具体位置
 
-<br><br>
+<br>
 
 ```bash
 git diff --stat
@@ -206,7 +206,7 @@ git diff --stat
 **说明：**
 显示差异的统计信息，包括文件、插入行和删除行的数量
 
-<br><br>
+<br>
 
 ```bash
 git diff --word-diff
@@ -214,7 +214,7 @@ git diff --word-diff
 **说明：**
 以单词为单位显示差异
 
-<br><br>
+<br>
 
 ```bash
 git diff --color #强制启用彩色显示
@@ -223,7 +223,7 @@ git diff --no-color #强制禁用彩色显示
 **说明：**
 显示/禁用彩色差异
 
-<br><br>
+<br>
 
 # git add
 ```bash
@@ -233,7 +233,7 @@ git add README.md #例
 **说明：**
 添加单个文件到暂存区
 
-<br><br>
+<br>
 
 ```bash
 git add <file1> <file2> <file3>
@@ -242,7 +242,7 @@ git add file1.txt file2.txt file3.txt #例
 **说明：**
 添加多个文件到暂存区
 
-<br><br>
+<br>
 
 ```bash
 git add <directory>
@@ -251,7 +251,7 @@ git add src/  #例
 **说明：**
 添加多个文件到暂存区
 
-<br><br>
+<br>
 
 ```bash
 git add .  #添加当前目录及其子目录中的更改
@@ -261,7 +261,7 @@ git add -A  #添加工作区中的所有更改
 **说明：**
 将工作区中的所有更改（包括已修改、已删除和新建的文件）添加到暂存区
 
-<br><br>
+<br>
 
 ```bash
 git add --update
@@ -269,7 +269,7 @@ git add --update
 **说明：**
 添加更改但排除删除的文件, 即将所有已修改和新建的文件添加到暂存区，但不会包括删除的文件
 
-<br><br>
+<br>
 
 ```bash
 git add -i
@@ -277,7 +277,7 @@ git add -i
 **说明：**
 以交互方式添加文件的更改，允许选择具体的更改块来添加到暂存区
 
-<br><br>
+<br>
 
 ```bash
 git add -n .
@@ -286,7 +286,7 @@ git add --dry-run
 **说明：**
 显示哪些文件将被添加，但不实际添加
 
-<br><br>
+<br>
 
 ```bash
 git add -v .
@@ -295,7 +295,7 @@ git add --verbose .
 **说明：**
 显示更详细的输出
 
-<br><br>
+<br>
 
 ```bash
 git add -f <file>
@@ -304,7 +304,7 @@ git add -f ignored-file.txt #例
 **说明：**
 强制添加被忽略的文件
 
-<br><br>
+<br>
 
 # git mv
 ```bash
@@ -315,7 +315,7 @@ git mv <source> <destination>
 \<destination\>: 文件或目录的新路径\
 git mv命令的操作会在工作区和暂存区进行，不会直接commit
 
-<br><br>
+<br>
 
 ```bash
 git mv <old file name> <new file name>
@@ -325,7 +325,7 @@ git mv old_name.txt new_name.txt
 ```
 **说明：** 重命名文件
 
-<br><br>
+<br>
 
 ```bash
 git mv <old file> <new directory>
@@ -333,7 +333,7 @@ git mv file.txt new_directory/
 ```
 **说明：** 将file.txt移动到new_directory目录下, Git会自动处理文件的路径更新，并记录这个移动操作
 
-<br><br>
+<br>
 
 ```bash
 git mv <old directory> <new directory>
@@ -343,7 +343,7 @@ git mv old_directory new_directory
 ```
 **说明：** 重命名目录
 
-<br><br>
+<br>
 
 ```bash
 git mv <old directory>/<old file name> <new directory>/<new file name>
