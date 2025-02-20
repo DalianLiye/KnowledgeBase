@@ -11,7 +11,7 @@ git init
 git init <directory>
 ```
 **说明：**
-在<directory>目录中初始化一个新的仓库\
+在\<directory\>目录中初始化一个新的仓库
 
 <br>
 
