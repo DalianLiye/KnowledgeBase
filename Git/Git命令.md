@@ -313,7 +313,7 @@ git mv <source> <destination>
 **说明：**
 \<source\>: 要移动或重命名的文件或目录的当前路径\
 \<destination\>: 文件或目录的新路径\
-git mv命令的操作会在工作区和暂存区进行，不会直接commit
+在工作区和暂存区移动或重命名文件或目录，不会直接commit
 
 <br>
 
@@ -352,3 +352,179 @@ git mv <old directory>/<old file name> <new directory>/<new file name>
 git mv old_directory/old_name.txt new_directory/new_name.txt  
 ```
 **说明：** 移动并重命名文件
+
+<br>
+
+# git rm
+git rm命令用于从工作区和暂存区中删除文件\
+它不仅删除文件，还将删除操作记录在暂存区，以便在下一次提交时将文件的删除包含在提交中
+
+<br>
+
+```bash
+git rm <file>
+
+git rm example.txt
+```
+**说明：** 删除文件并将删除操作添加到暂存区
+
+<br>
+
+```bash
+git rm -f <file>
+git rm --force <file>
+
+git rm -f example.txt
+```
+**说明：** 强制删除文件\
+如果文件被修改且尚未提交，Git会阻止删除操作以防止数据丢失\
+使用 -f（或 --force）选项可以强制删除文件
+
+<br>
+
+```bash
+git rm --cached <file>
+
+git rm --cached example.txt
+```
+**说明：** 删除工作区中的文件但保留在暂存区中的记录\
+该命令会从暂存区中移除文件 <file>，但保留工作区中的实际文件\
+这在希望停止跟踪某个文件但不实际删除它时非常有用
+
+<br>
+
+```bash
+git rm -r <directory>
+git rm --recursive <directory>
+
+git rm --cached example.txt
+```
+**说明：** 递归删除目录中的所有文件
+该命令会递归删除目录 <directory> 及其所有内容，并将这些删除操作添加到暂存区
+
+<br>
+
+# git commit
+将暂存区（staging area）中的更改记录到本地仓库的历史中\
+每次提交都会创建一个新的提交对象，包括作者信息、提交信息和更改记录
+
+<br>
+
+```bash
+git commit -m "Your commit message"
+```
+**说明：** 命令行里，输入提交信息
+
+<br>
+
+```bash
+git commit
+```
+**说明：** 打开默认编辑器，允许输入详细的提交信息，包括标题和详细描述\
+当提交信息有多行时，可以使用该方式
+
+<br>
+
+```bash
+git commit -a -m "Your commit message"
+```
+**说明：** -a选项会自动暂存所有已跟踪文件，然后进行提交，但不包括新创建的未跟踪文件
+如果不使用-a，则需要手动的把每一个文件add一遍，然后commit\
+如果使用-a，只要这个文件在仓库历史上曾经被提交过，就不需要每一个通过add命令添加到暂存区后再commit
+
+**关于文件跟踪：**
+- 已跟踪文件：已经Git仓库中进行过跟踪的文件，即之前已经被添加并提交过的文件\
+- 未跟踪文件：新创建的文件或未被Git跟踪的文件，-a选项不会将这些文件添加到暂存区
+比如，有<文件A>和<文件B>它们都在之前曾经被提交过（从仓库创建到现在都不曾被提交过），此时创建一个<文件C>是不会被添加到缓存区的
+
+**-a 选项与 git add 的区别:**
+- git add：用于将新文件或修改的文件添加到暂存区。需要手动指定文件
+- git commit -a：自动将所有已跟踪文件的更改（修改和删除）添加到暂存区，不会包含新文件
+
+<br>
+
+```bash
+git commit --amend
+```
+**说明：** 用于修改最近一次的提交
+该命令可以用来编辑提交消息，或将新的更改添加到最近的提交中，而不创建一个新的提交对象\
+当发现最近一次提交有错误或不完整时，使用该命令非常有用
+
+- 执行该命令，会打开默认文本编辑器，并编辑提交消息， 保存并关闭编辑器后，新提交消息将替换旧的提交消息\
+- 如果已经提交了更改，但忘记了一些文件或有新的更改需要包含在最近的提交中，可以先暂存这些新更改，然后使用 git commit --amend 添加它们到最近的提交中
+
+<br>
+
+# git log
+```bash
+git log
+```
+**说明：** 用于查看Git仓库的提交历史
+
+<br>
+
+```bash
+git log --oneline
+```
+**说明：** 一行显示提交历史,即每次的提交信息只显示一行
+
+<br>
+
+```bash
+git log -n <number>
+
+#例：显示最近的 3 个提交
+git log -n 3
+```
+**说明：** 限制显示的提交数量
+
+<br>
+
+```bash
+git log <file>
+```
+**说明：** 查看某个文件的提交历史
+
+<br>
+
+```bash
+git log --pretty=oneline
+git log --pretty=short
+git log --pretty=medium
+git log --pretty=full
+git log --pretty=fuller
+git log --pretty=format:"%h - %an, %ar : %s"
+```
+**说明：** 使用 --pretty 选项来定制输出格式
+
+<br>
+
+```bash
+git log --graph
+git log --graph --oneline --all #结合 --oneline 和 --all 选项一起使用
+```
+**说明：** 使用--graph选项来查看提交历史的图形表示
+
+<br>
+
+```bash
+git log --since="2 weeks ago"
+git log --until="2023-01-01"
+git log --since="2023-01-01" --until="2023-12-31"
+```
+**说明：** 使用 --since 和 --until 选项来查看某个时间段内的提交
+
+<br>
+
+```bash
+git log --author="John Doe"
+```
+**说明：** 使用 --author 选项来查看特定作者的提交
+
+<br>
+
+```bash
+git log -p
+git log -p -n 3 #-n选项限制显示的文件更改数量
+```
+**说明：** 使用 -p 选项来查看每个提交中具体的文件更改
