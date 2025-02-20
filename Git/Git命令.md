@@ -1,6 +1,6 @@
 # git init
-```sh
-git init [directory]
+```bash
+git init
 ```
 **说明：**
 在当前目录中初始化新的仓库
