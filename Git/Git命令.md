@@ -1,5 +1,5 @@
 # git init
-```bash
+```sh
 git init [directory]
 ```
 **说明：**
