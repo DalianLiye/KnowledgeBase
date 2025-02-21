@@ -827,7 +827,7 @@ git merge用于将另一个分支的更改合并到当前分支，并保持原�
 **使用示例**
 
 假设当前有如下分支：\
-A---B---C main
+A---B---C main\
 &emsp;&emsp;\\
 &emsp;&emsp;&ensp;D---E feature
 
@@ -839,8 +839,8 @@ git merge feature
 ```
 
 执行之后，会变成如下结构, 其中，F为合并提交
-A---B---C---F main
-&emsp;&emsp;\\&emsp;&emsp;/
+A---B---C---F main\
+&emsp;&emsp;\\&emsp;&emsp;/\
 &emsp;&emsp;D---E feature
 	  
 ## 何时使用 Rebase 和 Merge
