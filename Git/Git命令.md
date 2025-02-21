@@ -2,88 +2,85 @@
 ```bash
 git init
 ```
-**说明：**
-在当前目录中初始化新的仓库
+**说明：** 在当前目录中初始化新的仓库
 
 <br>
 
 ```bash
 git init <directory>
 ```
-**说明：**
-在\<directory\>目录中初始化一个新的仓库
+**说明：** 在\<directory\>目录中初始化一个新的仓库
 
 <br>
 
 # git config
 ```bash
-git config --global init.defaultBranch
+git config --global init.defaultBranch #当执行git init命令时，初始化的git仓库的默认分支就是该分支
 ```
-**说明：** 
-查看全局的默认分支设置\
-当执行git init命令时，初始化的git仓库的默认分支就是该分支
+**说明：** 查看全局的默认分支设置
 
 <br>
 
 ```bash
-git config --global init.defaultBranch [branch-name]
+git config --global init.defaultBranch [branch-name] #当执行git init命令时，初始化的git仓库的默认分支就会变成该分支
 ```
-**说明：**
-更改初始化新仓库时的默认分支名称\
-当执行git init命令时，初始化的git仓库的默认分支就会变成该分支
+**说明：** 更改初始化新仓库时的默认分支名称
+
 
 <br>
 
 # git clone
-获取一个现有的仓库\
-创建一个目录，并将远程仓库的内容克隆到本地目录中
 ```bash
 git clone <repo url>
 ```
+**说明：** 获取一个现有的仓库\
+创建一个目录，并将远程仓库的内容克隆到本地目录中
 
 <br>
 
 # git branch
-- 查看所有分支
 ```bash
 git branch
 ```
+**说明：** 查看所有分支
 
 <br>
 
-- 创建新的分支
 ```bash
 git branch feature-branch
 ```
+**说明：** 创建新的分支
 
 <br>
 
 # git checkout
 
-- 切换到指定分支
 ```
 git checkout <branch_name>
 ```
+**说明：** 切换到指定分支
 
 <br>
 
-- 创建并切换到指定分支
 ```bash
 git checkout -b new_branch_name
 ```
+**说明：** 创建并切换到指定分支
 
-- 将工作目录中的某个文件恢复到暂存区或最新提交的状态
+<br>
+
 ```bash
 git checkout -- filename
 ```
+**说明：** 将工作目录中的某个文件恢复到最新提交的状态(不是暂存区)
 
 <br>
 
 # git switch
-创建分支，并切换到该分支
 ```bash
 git switch -c <branch_name>
 ```
+**说明：** 创建分支，并切换到该分支
 
 <br>
 
