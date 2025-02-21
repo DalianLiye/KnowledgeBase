@@ -15,14 +15,14 @@ git init <directory>
 
 # git config
 ```bash
-git config --global init.defaultBranch #当执行git init命令时，初始化的git仓库的默认分支就是该分支
+git config --global init.defaultBranch # 当执行git init命令时，初始化的git仓库的默认分支就是该分支
 ```
 **说明：** 查看全局的默认分支设置
 
 <br>
 
 ```bash
-git config --global init.defaultBranch [branch-name] #当执行git init命令时，初始化的git仓库的默认分支就会变成该分支
+git config --global init.defaultBranch [branch-name] # 当执行git init命令时，初始化的git仓库的默认分支就会变成该分支
 ```
 **说明：** 更改初始化新仓库时的默认分支名称
 
@@ -33,8 +33,8 @@ git config --global init.defaultBranch [branch-name] #当执行git init命令时
 ```bash
 git clone <repo url>
 ```
-**说明：** 获取一个现有的仓库\
-创建一个目录，并将远程仓库的内容克隆到本地目录中
+**说明：** 克隆一个现有的仓库\
+创建一个目录，目录名为仓库的名称，并将远程仓库的内容克隆到本地目录中
 
 <br>
 
@@ -58,7 +58,7 @@ git branch feature-branch
 ```
 git checkout <branch_name>
 ```
-**说明：** 切换到指定分支
+**说明：** 工作区内的文件切换到指定分支
 
 <br>
 
