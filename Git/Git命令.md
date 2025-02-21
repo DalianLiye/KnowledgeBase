@@ -44,46 +44,81 @@ git clone <repo url>
 <br>
 
 # git branch
-- 查看所有分支
 ```bash
 git branch
 ```
+**说明：** 查看所有分支
 
 <br>
 
-- 创建新的分支
 ```bash
-git branch feature-branch
+git branch <new-branch>
 ```
+**说明：** 创建新的分支
+
+<br>
+
+```bash
+git branch -d <branch>
+git branch -D <branch> # 强制删除
+```
+**说明：** 用于删除指定的分支 <branch>\
+注意，如果该分支上有未合并的更改，Git不会允许删除。使用-D强制删除
+
+<br>
+
+```bash
+git branch -m <new-name>
+```
+**说明：** 当前分支重命名为 <new-name>
 
 <br>
 
 # git checkout
 
-- 切换到指定分支
 ```
-git checkout <branch_name>
+git checkout <branch_name/tag>
 ```
+**说明：** 切换到指定分支或tag, 并更新工作区
 
 <br>
 
-- 创建并切换到指定分支
 ```bash
 git checkout -b new_branch_name
 ```
+**说明：** 创建并切换到指定分支
 
-- 将工作目录中的某个文件恢复到暂存区或最新提交的状态
+<br>
+
 ```bash
 git checkout -- filename
 ```
+**说明：** 将工作目录中的某个文件恢复到暂存区或最新提交的状态
+
+<br>
+
+```bash
+git checkout <branch> -- <file-or-directory>
+```
+**说明：** 检出<branch>分支中特定的 <file-or-directory> 到当前工作区\
+这在需要恢复文件到特定版本时非常有用
+
+<br>
+
+```bash
+git checkout <commit>
+```
+**说明：** 将工作区重置到特定的提交<commit>的状态\
+这会进入"分离头指针"的状态（detached HEAD），即不再位于任何分支上，可以再执行git checkout <branch>命令回到分支上
 
 <br>
 
 # git switch
-创建分支，并切换到该分支
+
 ```bash
 git switch -c <branch_name>
 ```
+**说明：** 创建分支，并切换到该分支
 
 <br>
 
@@ -635,3 +670,190 @@ git reset --keep <commit>
 - 保留工作目录：工作目录中的任何未暂存更改会保留下来，前提是这些更改不会与目标提交的文件产生冲突。如果冲突，操作将失败并提示错误
 - 在执行重置前，会检查未暂存的更改是否与目标提交冲突，如果有冲突，将会拒绝操作并显示错误信息
 
+
+<br>
+
+# git revert
+
+```bash
+git revert <commit>
+```
+**说明：** 创建一个新的提交，反转<commit>提交的内容\
+比如，一共依次有五个提交，A,B,C,D,E, 如果C提交中修改了文件file.txt中的某一行文本，执行"git revert <commit C>"会创建一个新的提交F，它会修改file.txt，将内容改回C提交之前的状态
+
+<br>
+
+# git tag
+
+Git中的标签（tag）是用于标记项目历史中某个特定点的引用\
+标签通常用于标记发布点（例如 v1.0.0），因此开发者可以非常方便地标记和定位项目的重要里程碑
+
+- 轻量标签（Lightweight Tag）
+它们只是提交对象的一个引用（类似于分支，但不会移动），没有额外的元数据
+
+- 附注标签（Annotated Tag）
+它们存储额外的信息，包括打标签者的名字、电子邮件地址、日期和标签消息\
+附注标签实际上是存储在Git数据库中的一个独立对象
+
+```bash
+git tag
+```
+**说明：** 列出仓库中的所有标签
+
+<br>
+
+```bash
+git tag <tagname>
+
+git tag v1.0.0 # 例
+```
+**说明：** 在当前分支的最新提交（HEAD）上创建一个轻量标签
+
+<br>
+
+```bash
+git tag -a <tagname> -m "your message"
+```
+**说明：** 在当前分支的最新提交（HEAD）上创建一个附注标签
+
+<br>
+
+```bash
+git tag -d <tagname>
+```
+**说明：** 删除标签
+
+<br>
+
+# git merge
+
+```bash
+git merge <branchname>
+```
+**说明：** 合并分支<branchname>到当前分支
+
+<br>
+
+# gir rebase
+git rebase命令用于将一个分支中的一系列提交转移到另一个分支之上
+
+**使用场景:**
+
+- 保持提交历史整洁
+git rebase可以用来避免合并提交，保持项目历史干净、线性
+
+- 更新特性分支
+将主分支的新变化包含到特性分支中，使特性分支保持最新
+
+```bash
+git rebase <upstream-branch>
+```
+**说明：** 将当前分支的提交重新应用到<upstream-branch>分支\
+这种操作的效果是将当前分支的提交基于上游分支的最新提交点进行重新排列，从而生成一个线性的提交历史
+
+<br>
+
+```bash
+git rebase --continue
+```
+**说明：** 继续rebase操作
+
+<br>
+
+```bash
+git rebase --abort
+```
+**说明：** 中途放弃rebase操作
+
+
+<br>
+
+# git merge和git rebase
+
+## Git Rebase
+
+git rebase主要用于将一个分支中的一系列提交重新应用到另一个基底之上，从而生成一个线性的提交历史
+
+**特点**
+- 线性历史：Rebase 会重新应用提交，因此生成的历史看起来是线性的
+- 不产生额外的合并提交：Rebase 不会像 merge 那样产生一个额外的合并提交
+- 提交 ID 变化：Rebase 会重新生成被重新应用提交的提交对象，导致这些提交有新的提交ID
+
+**优点：**
+- 提交历史更加干净和线性，易于理解和阅读
+- 在代码评审时，线性的历史可以更好地追踪更改
+
+**缺点：**
+- 改变了提交的 SHA-1 散列值，违反了Git中不要在共享分支上重写历史的最佳实践
+- 在处理复杂历史时，可能会遇到更多的冲突
+
+**使用示例**
+假设当前有如下分支：\
+
+A---B---C main
+&emsp;&emsp;\\
+&emsp;&emsp;&ensp;D---E feature
+
+
+在feature分支上执行git rebase main
+```bash
+git checkout feature
+git rebase main
+```
+
+执行之后，会变成如下结构：\
+A---B---C---D'---E' main
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;\\
+&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;feature
+
+
+## Git Merge
+
+git merge用于将另一个分支的更改合并到当前分支，并保持原有的提交历史。
+
+**特点**
+- 保留历史：Merge 保留了所有分支的提交历史
+- 产生一个合并提交：Merge 会生成一个新的合并提交，这个合并提交的父提交有两个或多个
+- 不改变提交 ID：Merge 不会改变已有提交的提交 ID
+
+**优点：**
+- 保留了完整的历史，包括分支和合并的过程
+- 更适合在长期维护的分支上进行操作，因为可以清楚地看到分支和合并点
+
+**缺点：**
+- 提交历史可能会变得复杂，尤其是当有大量的分支和合并时
+- 生成的合并提交有时可能会使历史变得混乱
+
+**使用示例**
+
+假设当前有如下分支：\
+A---B---C main
+&emsp;&emsp;\\
+&emsp;&emsp;&ensp;D---E feature
+
+
+在main分支上执行git merge feature
+```bash
+git checkout main
+git merge feature
+```
+
+执行之后，会变成如下结构, 其中，F为合并提交
+A---B---C---F main
+&emsp;&emsp;\\&emsp;&emsp;/
+&emsp;&emsp;D---E feature
+	  
+## 何时使用 Rebase 和 Merge
+- git rebase：
+  - 想要保持提交历史的线性和整洁
+  - 在共享或发布代码之前进行清理
+  - 在个人分支上进行操作，以便将所有更改合并到一个单一的线性历史中
+
+- git merge：
+  - 想要保留完整的历史记录，包括分支和合并点
+  - 在进行长期维护的分支上操作，以保留所有的变更历史
+  - 合并已经公共的分支，以避免潜在的历史重写问题
+
+## 总结
+- rebase重新应用提交，生成线性的历史，适用于清理历史和创建线性的提交图
+- merge保留所有合并点和完整的分支历史，适用于保留详细的历史记录和长期维护分支
