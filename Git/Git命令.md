@@ -856,3 +856,90 @@ A---B---C---F main\
 ## 总结
 - rebase重新应用提交，生成线性的历史，适用于清理历史和创建线性的提交图
 - merge保留所有合并点和完整的分支历史，适用于保留详细的历史记录和长期维护分支
+
+<br>
+
+# git remote
+git remote命令用于管理和操作Git仓库的远程存储库\
+远程存储库是指托管在服务器上的Git仓库，通常用于与其他开发人员共享和协作代码
+
+```bash
+git remote
+```
+**说明：** 列出所有配置的远程仓库名称
+
+<br>
+
+```bash
+git remote -v
+```
+**说明：** 列出所有远程仓库的名称及其 URL。-v 选项表示显示详细信息（verbose）
+
+<br>
+
+```bash
+git remote add <name> <url>
+git remote add origin https://github.com/user/repo.git #例
+```
+**说明：** 用于添加一个新的远程仓库
+- \<name\>：远程仓库的名字（例如 origin）
+- \<url\>：远程仓库的 URL 地址（例如 https://github.com/user/repo.git）
+
+<br>
+
+```bash
+git remote remove <name>
+```
+**说明：** 用于删除一个远程仓库, 
+- \<name\>：要删除的远程仓库的名字
+
+<br>
+
+```bash
+git remote rename <old-name> <new-name>
+```
+**说明：** 重命名一个远程仓库
+
+<br>
+
+```bash
+git remote set-url <name> <newurl>
+```
+**说明：** 修改远程仓库的 URL
+
+<br>
+
+```bash
+git remote show <name>
+```
+**说明：** 显示远程仓库的详细信息
+
+
+# git fetch
+用于从远程仓库获取最新的更改，但不会自动合并这些更改到当前的工作分支\
+简而言之，git fetch只是更新本地对远程分支的记录，而不影响当前工作目录的状态
+
+```bash
+git fetch
+```
+**说明：** 从所有配置的远程仓库中拉取更新
+
+<br>
+
+```bash
+git fetch <remote>
+
+git fetch origin # 从远程仓库origin拉取更新
+```
+**说明：** 从指定的远程仓库中拉取更新
+
+<br>
+
+```bash
+git fetch <remote> <branch>
+ 
+git fetch origin main # 从远程仓库origin的main分支拉取更新
+```
+**说明：** 从指定的远程仓库中拉取特定分支的更新
+
+
