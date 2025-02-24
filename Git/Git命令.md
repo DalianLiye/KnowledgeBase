@@ -130,6 +130,14 @@ Git中的一个术语，指的是当正在检查一个指定的提交（而不�
 
 <br>
 
+```bash
+git checkout HEAD .
+git checkout HEAD <file name>
+```
+**说明：** 将HEAD指向的分支中的全部或者部分文件替换重置暂存区和以及工作区中的文件
+
+<br>
+
 # git switch
 
 ```bash
@@ -634,11 +642,20 @@ git reset --soft HEAD~1
 <br>
 
 ```bash
+git reset HEAD
+or
+git reset --mixed HEAD
+```
+**说明：** 将当前分支的HEAD指针指向最新提交，并将最新提交内容重置到索引区（暂存区），但保留工作目录中的更改
+
+<br>
+
+```bash
 git reset HEAD~1
 or
 git reset --mixed HEAD~1
 ```
-**说明：** 将当前分支的HEAD指针回退到上一个提交，并重置索引区（暂存区），但保留工作目录中的更改
+**说明：** 将当前分支的HEAD指针指向上一个提交，并将上一个提交内容重置到索引区（暂存区），但保留工作目录中的更改
 
 <br>
 
