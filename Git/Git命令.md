@@ -35,11 +35,20 @@ git config --global init.defaultBranch [branch-name]
 <br>
 
 # git clone
-获取一个现有的仓库\
-创建一个目录，并将远程仓库的内容克隆到本地目录中
+
 ```bash
 git clone <repo url>
 ```
+**说明：** 获取一个现有的仓库\
+创建一个目录，并将远程仓库的内容克隆到本地目录中
+
+<br>
+
+```bash
+git clone -b <branch name> <repo url>
+```
+**说明：** 获取一个现有的仓库的指定分支\
+创建一个目录，并将远程仓库指定分支的内容克隆到本地目录中
 
 <br>
 
@@ -79,7 +88,7 @@ git branch -m <new-name>
 ```
 git checkout <branch_name/tag>
 ```
-**说明：** 切换到指定分支或tag, 并更新工作区
+**说明：** 切换到指定分支或tag(将指定分支或tag的内容更新工作区)
 
 <br>
 
@@ -93,14 +102,14 @@ git checkout -b new_branch_name
 ```bash
 git checkout -- filename
 ```
-**说明：** 将工作目录中的某个文件恢复到暂存区或最新提交的状态
+**说明：** 将工作区中的某个文件恢复到最新提交的状态（不是暂存区）
 
 <br>
 
 ```bash
 git checkout <branch> -- <file-or-directory>
 ```
-**说明：** 检出<branch>分支中特定的 <file-or-directory> 到当前工作区\
+**说明：** 从当前分支最新提交中检出特定的 \<file-or-directory\>到当前工作区\
 这在需要恢复文件到特定版本时非常有用
 
 <br>
@@ -110,6 +119,12 @@ git checkout <commit>
 ```
 **说明：** 将工作区重置到特定的提交<commit>的状态\
 这会进入"分离头指针"的状态（detached HEAD），即不再位于任何分支上，可以再执行git checkout <branch>命令回到分支上
+
+
+**分离头指针状态”（Detached HEAD State）**\
+Git中的一个术语，指的是当正在检查一个特定的提交（而不是分支）时，Git 的HEAD指针不再指向任何分支，而是指向某个具体的提交对象\
+这种状态下，可以查看、修改和测试代码，但所做的更改并不属于任何分支
+
 
 <br>
 
@@ -123,19 +138,19 @@ git switch -c <branch_name>
 <br>
 
 # git checkout和git switch的区别
-- 功能专一性：
+- **功能专一性：**
 git checkout 是一个多用途命令，既可以用于切换分支，也可以用于恢复文件
 git switch 专用于分支操作，只用于切换分支和创建新分支
 
-- 命令的语义清晰度：
+- **命令的语义清晰度：**
 git switch 的引入使得分支切换操作更加直观和简洁，减少了命令的复杂性
 git checkout 由于其多功能性，命令语义相对不够直观，需要更多记忆和理解
 
-- 用户体验：
+- **用户体验：**
 git switch 提供了明确的分支切换和创建功能，降低了误操作的可能性
 git checkout 因其多功能性，易导致用户混淆或误操作
 
-- 实际使用场景:
+- **实际使用场景:**
 git switch：当只需要进行分支管理（切换分支或创建新的分支）时，推荐使用 git switch。它具有更清晰的语义，更易于理解和使用\
 git checkout：当需要恢复文件到暂存区或最新提交版本时，需要使用 git checkout。另外，某些情况下如果你使用的是较旧版本的 Git，git switch 可能不可用（Git 2.23 之前没有 git switch）
 
@@ -145,8 +160,7 @@ git checkout：当需要恢复文件到暂存区或最新提交版本时，需�
 ```bash
 git status
 ```
-**说明：**
-查看当前仓库状态
+**说明：** 查看当前仓库状态
 
 <br>
 
@@ -154,8 +168,7 @@ git status
 ```bash
 git diff
 ```
-**说明：**
-用于比较Git工作区与暂存区或与其他分支或提交之间的差异\
+**说明：** 用于比较工作目区尚未暂存的更改与暂存区（索引）中的内容之间的差异
 
 <br>
 
@@ -164,24 +177,21 @@ git diff --staged
 or
 git diff --cached
 ```
-**说明：**
-比对暂存区与最新提交之间的差异
+**说明：** 比对暂存区与最新提交之间的差异
 
 <br>
 
 ```bash
 git diff HEAD 
 ```
-**说明：**
-显示工作区与最新提交之间的差异
+**说明：** 显示工作区与最新提交之间的差异
 
 <br>
 
 ```bash
 git diff branch1 branch2
 ```
-**说明：**
-比较分支之间的差异
+**说明：** 比较分支之间的差异
 
 <br>
 
@@ -189,8 +199,7 @@ git diff branch1 branch2
 git diff <commit1> <commit2>
 git diff 6fbf3d8 8f0d3a9 #例
 ```
-**说明：**
-比较两个提交之间的差异
+**说明：** 比较两个提交之间的差异
 
 <br>
 
@@ -203,24 +212,21 @@ git diff main dev -- src/app.js
 #例: 显示commit1和commit2这两个提交中， src/app.js文件的差异
 git diff commit1 commit2 -- <file> 
 ```
-**说明：**
-显示特定文件的差异
+**说明：** 显示特定文件的差异
 
 <br>
 
 ```bash
 git diff --name-only
 ```
-**说明：**
-只显示修改的文件名
+**说明：** 只显示修改的文件名
 
 <br>
 
 ```bash
 git diff --name-status
 ```
-**说明：**
-显示文件名和文件状态（新增、修改、删除）
+**说明：** 显示文件名和文件状态（新增、修改、删除）
 
 <br>
 
@@ -229,8 +235,7 @@ git diff -p
 or
 git diff --patch
 ```
-**说明：**
-生成差异补丁格式，这通常是默认选项\
+**说明：** 生成差异补丁格式，这通常是默认选项\
 该格式显示了更详细的、更结构化的差异信息，包括上下文行和修改的具体位置
 
 <br>
@@ -238,16 +243,14 @@ git diff --patch
 ```bash
 git diff --stat
 ```
-**说明：**
-显示差异的统计信息，包括文件、插入行和删除行的数量
+**说明：** 显示差异的统计信息，包括文件、插入行和删除行的数量
 
 <br>
 
 ```bash
 git diff --word-diff
 ```
-**说明：**
-以单词为单位显示差异
+**说明：** 以单词为单位显示差异
 
 <br>
 
@@ -255,8 +258,7 @@ git diff --word-diff
 git diff --color #强制启用彩色显示
 git diff --no-color #强制禁用彩色显示
 ```
-**说明：**
-显示/禁用彩色差异
+**说明：** 显示/禁用彩色差异
 
 <br>
 
@@ -265,8 +267,7 @@ git diff --no-color #强制禁用彩色显示
 git add <file>
 git add README.md #例
 ```
-**说明：**
-添加单个文件到暂存区
+**说明：** 添加单个文件到暂存区
 
 <br>
 
@@ -274,8 +275,7 @@ git add README.md #例
 git add <file1> <file2> <file3>
 git add file1.txt file2.txt file3.txt #例
 ```
-**说明：**
-添加多个文件到暂存区
+**说明：** 添加多个文件到暂存区
 
 <br>
 
@@ -283,8 +283,7 @@ git add file1.txt file2.txt file3.txt #例
 git add <directory>
 git add src/  #例
 ```
-**说明：**
-添加多个文件到暂存区
+**说明：** 添加多个文件到暂存区
 
 <br>
 
@@ -293,24 +292,21 @@ git add .  #添加当前目录及其子目录中的更改
 or
 git add -A  #添加工作区中的所有更改
 ```
-**说明：**
-将工作区中的所有更改（包括已修改、已删除和新建的文件）添加到暂存区
+**说明：** 将工作区中的所有更改（包括已修改、已删除和新建的文件）添加到暂存区
 
 <br>
 
 ```bash
 git add --update
 ```
-**说明：**
-添加更改但排除删除的文件, 即将所有已修改和新建的文件添加到暂存区，但不会包括删除的文件
+**说明：** 添加更改但排除删除的文件, 即将所有已修改和新建的文件添加到暂存区，但不会包括删除的文件
 
 <br>
 
 ```bash
 git add -i
 ```
-**说明：**
-以交互方式添加文件的更改，允许选择具体的更改块来添加到暂存区
+**说明：** 以交互方式添加文件的更改，允许选择具体的更改块来添加到暂存区
 
 <br>
 
@@ -318,8 +314,7 @@ git add -i
 git add -n .
 git add --dry-run
 ```
-**说明：**
-显示哪些文件将被添加，但不实际添加
+**说明：** 显示哪些文件将被添加，但不实际添加
 
 <br>
 
@@ -327,8 +322,7 @@ git add --dry-run
 git add -v .
 git add --verbose .
 ```
-**说明：**
-显示更详细的输出
+**说明：** 显示更详细的输出
 
 <br>
 
@@ -336,8 +330,7 @@ git add --verbose .
 git add -f <file>
 git add -f ignored-file.txt #例
 ```
-**说明：**
-强制添加被忽略的文件
+**说明：** 强制添加被忽略的文件
 
 <br>
 
@@ -562,7 +555,7 @@ git log --author="John Doe"
 git log -p
 git log -p -n 3 #-n选项限制显示的文件更改数量
 ```
-**说明：** 使用 -p 选项来查看每个提交中具体的文件更改
+**说明：** 使用-p选项来查看每个提交中具体的文件更改
 
 <br>
 
@@ -608,7 +601,7 @@ git blame -e <file>
 ```
 **说明：** 显示任何可归因的内联注释,使用 -e 选项，将作者的电子邮件地址显示在输出中
 
-
+<br>
 
 # git reset
 git reset是Git用来撤销更改的命令\
@@ -640,21 +633,22 @@ git reset --mixed HEAD~1
 <br>
 
 ```bash
-git reset --hard HEAD~1
+git reset --hard HEAD    # 将当前分支的状态重置到最近的提交（即 HEAD 指向的提交）
+git reset --hard HEAD~1  # 将当前分支的状态重置到最近的提交的上一个提交（HEAD指针回退到上一个提交）
 ```
-**说明：** 将当前分支的HEAD指针回退到上一个提交，同时重置索引区和工作目录
+**说明：** 将当前分支的HEAD指针回退到指定的提交，同时重置索引区和工作目录
 
 <br>
 
 ```bash
 git reset <commit>
 ```
-**说明：** 将当前分支重置到指定的提交，保留工作目录中的未暂存更改
+**说明：** 将当前分支重置到指定的提交，保留工作区中的未暂存更改
 
 具体执行如下：
-- 将 HEAD 指针移至指定的提交
+- 将HEAD指针移至指定的提交
 - 将索引区重置为与指定提交相同的状态，任何在暂存区中的更改将被丢弃
-- 工作目录保持不变，已经修改但未暂存的文件保留下来
+- 工作区保持不变，已经修改但未暂存的文件保留下来
 
 <br>
 
@@ -669,7 +663,6 @@ git reset --keep <commit>
 - 将索引区重置为与指定提交相同的状态，任何在暂存区中的更改将被丢弃
 - 保留工作目录：工作目录中的任何未暂存更改会保留下来，前提是这些更改不会与目标提交的文件产生冲突。如果冲突，操作将失败并提示错误
 - 在执行重置前，会检查未暂存的更改是否与目标提交冲突，如果有冲突，将会拒绝操作并显示错误信息
-
 
 <br>
 
@@ -688,10 +681,10 @@ git revert <commit>
 Git中的标签（tag）是用于标记项目历史中某个特定点的引用\
 标签通常用于标记发布点（例如 v1.0.0），因此开发者可以非常方便地标记和定位项目的重要里程碑
 
-- 轻量标签（Lightweight Tag）
+- **轻量标签（Lightweight Tag）**
 它们只是提交对象的一个引用（类似于分支，但不会移动），没有额外的元数据
 
-- 附注标签（Annotated Tag）
+- **附注标签（Annotated Tag）**
 它们存储额外的信息，包括打标签者的名字、电子邮件地址、日期和标签消息\
 附注标签实际上是存储在Git数据库中的一个独立对象
 
@@ -728,9 +721,17 @@ git tag -d <tagname>
 # git merge
 
 ```bash
-git merge <branchname>
+git merge <branch name>
 ```
-**说明：** 合并分支<branchname>到当前分支
+**说明：** 合并分支<branch name>到当前分支
+
+<br>
+
+```bash
+git merge <remote>/<branch name>
+git merge origin/feature #合并origin的feature分支到当前分支
+```
+**说明：** 合并远程分支到当前分支
 
 <br>
 
@@ -739,10 +740,10 @@ git rebase命令用于将一个分支中的一系列提交转移到另一个分�
 
 **使用场景:**
 
-- 保持提交历史整洁
+- **保持提交历史整洁**
 git rebase可以用来避免合并提交，保持项目历史干净、线性
 
-- 更新特性分支
+- **更新特性分支**
 将主分支的新变化包含到特性分支中，使特性分支保持最新
 
 ```bash
@@ -873,12 +874,12 @@ git remote
 ```bash
 git remote -v
 ```
-**说明：** 列出所有远程仓库的名称及其 URL。-v 选项表示显示详细信息（verbose）
+**说明：** 列出所有远程仓库的名称及其URL, -v 选项表示显示详细信息（verbose）
 
 <br>
 
 ```bash
-git remote add <name> <url>
+git remote add <remote> <url>
 git remote add origin https://github.com/user/repo.git #例
 ```
 **说明：** 用于添加一个新的远程仓库
@@ -917,7 +918,7 @@ git remote show <name>
 
 # git fetch
 用于从远程仓库获取最新的更改，但不会自动合并这些更改到当前的工作分支\
-简而言之，git fetch只是更新本地对远程分支的记录，而不影响当前工作目录的状态
+简而言之，git fetch只是更新本地对远程分支的记录，而当前分支及其提交状态、暂存区和工作区将保持不变
 
 ```bash
 git fetch
@@ -942,4 +943,84 @@ git fetch origin main # 从远程仓库origin的main分支拉取更新
 ```
 **说明：** 从指定的远程仓库中拉取特定分支的更新
 
+<br>
 
+# git pull
+git pull是一个用于从远程仓库获取更新并将这些更新合并到当前分支的Git命令\
+它的功能可以视为git fetch和git merge两个命令的组合
+
+```bash
+git pull
+```
+**说明：** 运行git pull时，会依次执行以下操作
+- **获取最新的提交：**
+  首先从远程仓库（通常是 tracking branch，如 origin/main）下载所有的新提交和更新， 相当于执行git fetch
+- **合并更新：**
+  将这些新的提交合并到当前所在的分支，相当于执行git merge\
+  如果没有冲突，合并将自动完成\
+  如果有冲突，需要手动解决这些冲突
+
+<br>
+
+```bash
+git pull <remote> <branch_name>
+
+git pull origin main #例
+```
+**说明：** 从远程仓库指定分支拉取更新\
+remote是远程仓库的名称\
+branch_name是想要从中拉取更新的分支
+
+<br>
+
+```bash
+git pull --rebase
+```
+**说明：** 使用--rebase选项来代替默认的合并方式, 用于从远程仓库拉取更改时将本地的未提交更改应用到远程更改之上，而不是合并它们\
+这种方法可以保持项目历史的清晰和线性，避免了合并提交（merge commits）的产生
+
+<br>
+
+# git push
+用于将本地仓库中的提交（commits）推送到远程仓库
+
+```bash
+git push <remote> <local branch name>
+git push origin main #例：推送当前main分支到远程仓库origin的main分支
+
+git push <remote> <local_branch>:<remote branch> #推送当前仓库指定分支到远程仓库的指定分支
+```
+**说明：** 推送本地分支到远程仓库的同名分支或不同分支
+
+<br>
+
+```bash
+git push <remote> --delete <branch name/tag>
+git push <remote> :<branch name> #注意，"："前有一个空格，
+```
+**说明：** 删除远程仓库的指定分支或标签
+
+<br>
+
+```bash
+git push --force origin main
+```
+**说明：** --force表示强制推送，覆盖远程分支的内容\
+一般不推荐使用，除非知道自己在做什么，因为这可能会导致数据丢失
+
+<br>
+
+```bash
+git push -u origin new-branch
+git push --set-upstream origin new-branch
+```
+**说明：** --set-upstream 或 -u： 在首次推送一个本地分支到远程时，使用这个选项可以将本地分支与远程分支关联，这样下次可以直接使用git push
+
+<br>
+
+```bash
+git push --tags
+git push --tags <remote>
+```
+**说明：** 推送所有标签到远程仓库\
+如果省略 <remote>，默认将标签推送到默认的远程仓库（通常是 origin）
