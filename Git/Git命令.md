@@ -56,14 +56,22 @@ git clone -b <branch name> <repo url>
 ```bash
 git branch
 ```
-**说明：** 查看仓库所有分支
+**说明：** 查看所有本地仓库所有分支\
+**注：** 如果本地仓库新建，且没有任何提交记录，则执行git branch命令后，不会有任何返回结果
 
 <br>
 
 ```bash
+git branch -a
+```
+**说明：** 查看本地仓库和远程仓库的所有分支
+
+<br>
+```bash
 git branch <new-branch>
 ```
-**说明：** 创建新的分支
+**说明：** 创建新的分支\
+**注：** 如果本地仓库新建，且没有任何提交记录，则执行git branch <new-branch>命令后，会报"fatal: not a valid object name: <default branch name>"错误
 
 <br>
 
@@ -72,7 +80,7 @@ git branch -d <branch name>
 git branch -D <branch name> # 强制删除
 ```
 **说明：** 用于删除指定的分支\
-注意，如果该分支上有未合并的更改，Git不会允许删除, 需要使用-D强制删除
+**注：** 如果该分支上有未合并的更改，Git不会允许删除, 需要使用-D强制删除
 
 <br>
 
@@ -88,7 +96,8 @@ git branch -m <new branch name>
 ```
 git checkout <branch_name/tag>
 ```
-**说明：** 工作区的内容切换到指定分支或tag
+**说明：** 工作区和暂存区的内容切换到指定分支或tag\
+**注：** 如果当前分支下，有新增为追踪的文件，切换分支后，它依然会存在于切换后分支下的工作区内
 
 <br>
 
@@ -1060,3 +1069,24 @@ git push --tags <remote>
 ```
 **说明：** 推送所有标签到远程仓库\
 如果省略 <remote>，默认将标签推送到默认的远程仓库（通常是 origin）
+
+<br>
+
+# git clean
+git clean用于清理违背追踪的文件和目录\
+执行git clean时需谨慎，因为它会永久删除未被追踪的文件和目录，无法恢复\
+因此，务必在执行前使用 git clean -n进行检查确认
+
+```bash
+git clean -n
+```
+**说明：** 确认删除未被追踪的文件
+
+<br>
+
+```bash
+git clean -f #删除文件
+git clean -d #删除目录
+git clean -d #删除文件和目录
+```
+**说明：** 强制删除未被追踪的文件或目录\
