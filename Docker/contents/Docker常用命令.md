@@ -155,7 +155,7 @@ docker ps -l  #显示最近创建的容器
 docker ps -n  #显示最近n个创建的容器
 docker ps -q  #静默模式，只显示容器编号
 ```
-**说明：** 列出当前所有正在运行的容器
+**说明：** 列出当前所有正在运行的容器\
 **注：** 启动容器后建议执行docker ps查看下容器是否启动成功
 
 
@@ -224,7 +224,7 @@ docker logs <container_id>
 ```bash
 docker top <container_id> 
 ```
-**说明：** 查看容器内的进程
+**说明：** 查看容器内的进程\
 **注：** 每一个容器其实也是一个简易版的linux环境，因此是可以内部进程
 	
 <br>
@@ -307,10 +307,4 @@ docker import myimage.tar myrepo/myimage:latest
 cat myimage.tar | docker import - myrepo/myimage:latest
 ```	
 **说明：** 将.tar文件作为Docker镜像导入容器
-	
-	
-	
-	
-	
-
 	
