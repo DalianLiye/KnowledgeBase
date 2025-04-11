@@ -128,18 +128,46 @@ docker run [options] image [command][arg...]
 - \-d: 后台运行容器并返回容器ID,也即启动守护式容器(后台运行)
 - \-i: 以交互模式运行容器，通常与-t同时使用
 - \-t： 为容器重新分配一个伪输入终端，通常与-t同时使用-i同时使用, 也即启动交互式容器(前台有伪终端，等待交互)
+- \-p: 小写p,指定端口映射
+- \-P: 大写p,随机端口映射
+
+<br>
 
 ```bash
 docker run -it ubuntu  /bin/bash #表示启动一个ubuntu的容器，同时返回一个终端可以跟该容器交互，交互命令的接口是shell,即/bin/bash，容器的名字系统会随机分配
 docker run -it --name=myu1 ubuntu  /bin/bash  #效果同上，只是启动的实例叫myu1
 ```
--P: 随机端口映射，大写P
--p： 指定端口映射，小写p
+
+<br>
 
 ```bash		   
 docker run -d <container>  #启动守护式容器(后台服务器)，与-it 交互式容器相对应
 ```
-**注：** 命令执行后马上退出，这是docker机制的问题
+**说明：** 命令执行后马上退出，这是docker机制的问题
+
+<br>
+
+```bash
+# 启动容器，配置宿主机与容器的映射
+docker run -p 6379:6379 #将容器的6379端口映射到主机的6379s端口
+--name myr3  #新建容器, 名字是myr3
+--privileged=true  #允许容器以特权模式运行，给予容器更高的权限, 通常用于需要访问主机硬件或执行特定操作的场景
+-v /app/redis/redis.conf:/etc/redis/redis.conf  #挂载主机文件到容器指定文件
+-v /app/redis/data:/data   #挂载主机目录到容器指定目录
+-d redis:6.0.8 redis-server /etc/redis/redis.conf  #以分离模式（后台模式）运行容器， 使用镜像为redis:6.0.8，启动容器后运行命令"redis-server /etc/redis/redis.conf"
+
+
+# 当在宿主机修改了/app/redis/redis.conf文件，需要重启容器才能读取最新的配置
+docker restart myr3
+
+
+# 当宿主机向/app/redis/data更新了数据文件，不需要重启容器就可以直接读取更新的文件
+<no action required>
+```
+**说明：** 容器和宿主机共享相同文件或目录好处是
+1) 一旦容器停掉，不至于容易内的数据丢失，而是存储到了映射的宿主机的目录或文件上
+2) 可以直接在宿主机上操作更新，而无需进入容器内操作
+
 
 <br>
 
@@ -307,4 +335,3 @@ docker import myimage.tar myrepo/myimage:latest
 cat myimage.tar | docker import - myrepo/myimage:latest
 ```	
 **说明：** 将.tar文件作为Docker镜像导入容器
-	
