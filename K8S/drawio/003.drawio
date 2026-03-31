@@ -1,0 +1,46 @@
+<mxfile host="65bd71144e">
+    <diagram id="3pKmiKyK1p_IjhjkPqaK" name="Page-1">
+        <mxGraphModel dx="1681" dy="1656" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="850" pageHeight="1100" math="0" shadow="0">
+            <root>
+                <mxCell id="0"/>
+                <mxCell id="1" parent="0"/>
+                <mxCell id="2" value="StatefulSet" style="rounded=1;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="-280" y="-100" width="930" height="370" as="geometry"/>
+                </mxCell>
+                <mxCell id="3" value="volumeClaim Template" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="170" y="-50" width="430" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="4" value="Headless Service" style="rounded=1;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-240" y="-50" width="390" height="70" as="geometry"/>
+                </mxCell>
+                <mxCell id="5" value="Pod: redis&lt;div&gt;redis-sts-0.redis-svc.wolfcode.svc.cluster.local&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="-240" y="40" width="280" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="6" value="Pod:redis&lt;div&gt;redis-sts-1.redis-svc.wolfcode.svc.cluster.local&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="60" y="40" width="260" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="7" value="Pod: redis&lt;div&gt;redis-sts-2.redis-svc.wolfcode.svc.cluster.local&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;verticalAlign=top;" vertex="1" parent="1">
+                    <mxGeometry x="350" y="40" width="260" height="210" as="geometry"/>
+                </mxCell>
+                <mxCell id="8" value="容器&lt;div&gt;master&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-150" y="90" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="9" value="容器&lt;div&gt;slave&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="125" y="90" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="10" value="容器&lt;div&gt;slave&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="90" width="120" height="40" as="geometry"/>
+                </mxCell>
+                <mxCell id="11" value="pause&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;网络，文件系统等&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="-150" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="12" value="pause&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;网络，文件系统等&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="125" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+                <mxCell id="13" value="pause&lt;div&gt;&lt;br&gt;&lt;/div&gt;&lt;div&gt;网络，文件系统等&lt;/div&gt;" style="rounded=0;whiteSpace=wrap;html=1;" vertex="1" parent="1">
+                    <mxGeometry x="420" y="170" width="120" height="60" as="geometry"/>
+                </mxCell>
+            </root>
+        </mxGraphModel>
+    </diagram>
+</mxfile>
