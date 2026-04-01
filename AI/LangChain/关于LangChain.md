@@ -12,20 +12,20 @@ LangChain有以下优势：
 
 
 LangChain生态包含以下几个组件：
-- LangChain\
+- **LangChain**\
   用于创建自定义Agent\
   LangChain是基于LangGraph构建的
 
-- LangGraph\
+- **LangGraph**\
   agent 工作流的编排系统\
   适用于有固定流程，且需要高度自定义的场景
 
-- Deep Agent\
+- **Deep Agent**\
   Deep Agent是以LangChain为基础的一个具体实现\
   它额外增加了一些功能，比如long conversations compression, virtual filesystem, subagent-spawning\
   如果不需要这些额外的功能，或者想从头到尾创建一个自定义agent，可以选择LangChain
 
-- LangSmith\
+- **LangSmith**\
   用于追踪请求，debug，评估输出结果等
 
 以下是一个简单的示例
