@@ -1,0 +1,1 @@
+https://github.com/awslabs/amazon-redshift-utils/blob/master/src/AdminViews/v_view_dependency.sql
