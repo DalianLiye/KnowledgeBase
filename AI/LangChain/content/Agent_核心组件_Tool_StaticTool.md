@@ -44,7 +44,7 @@ def weather_tool(city: str, unit: str = "celsius") -> str:
   提供了一句中文描述：查询指定城市的当前天气信息\
   LLM 会根据描述，决定何时调用这个工具（这对工具路由很重要）
 
-- args_schema
+- args_schema\
   参数 schema 按定义的 TypedDict 来，可以精确控制传入参数的字段名、类型等
 
 
