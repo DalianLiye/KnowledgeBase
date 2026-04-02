@@ -1,6 +1,6 @@
 # 关于DAG
 DAG全称：Directed Acyclic Graph （向无环图）, 它是 Airflow的核心概念\
-DAG包含了一组task的集合，DAG中定义了如何运行集合中的task，比如各task之间的执行顺序，以及执行前后的依赖关系\
+DAG包含了一组task的集合，DAG中定义了如何运行这些task，比如各task之间的执行顺序，以及执行前后的依赖关系\
 一个DAG如果不包含任何task将毫无意义
 
 DAG中的task包含以下种类：
@@ -9,7 +9,7 @@ DAG中的task包含以下种类：
 - TaskFlow
 
 DAG里定义了DAG的执行频率，比如每5分钟，每天，每年的1月1日等\
-DAG仅仅是一个调度工具，它并不关心task的具体内容，只关心task的执行顺序，执行时间，执行次数，执行超时这样的操作
+DAG仅仅是一个调度工具，它并不关心task的具体内容，只关心task的执行顺序，执行时间，执行次数，执行超时等操作
 
 
 # 定义DAG
@@ -28,7 +28,7 @@ DAG仅仅是一个调度工具，它并不关心task的具体内容，只关心t
      EmptyOperator(task_id="task")
 ```
 
-- **方式2：** 使用标准构造函数，将DAG传递给使用的任何operator/task
+- **方式2：** 使用标准构造函数，将DAG传递给使用的任何operator
 ```python
  import datetime
  from airflow import DAG
@@ -55,10 +55,10 @@ def generate_dag():
 generate_dag()
 ```
 
-# Task依赖
-DAG里通常会定义多个task，而各task之间通常也是有依赖关系的
+# Task之间的依赖
+DAG里通常会定义多个task，而各task之间通常也是有依赖关系的（上游和下游）
 
-Task之间依赖关系的定义主要有以下两种方式：
+Task之间依赖关系的定义主要有以下方式：
 - **方式1：** 使用操作符>>和<<(推荐)
 ```python
 first_task >> [second_task, third_task]
@@ -95,7 +95,7 @@ chain(*[EmptyOperator(task_id='op' + i) for i in range(1, 6)])
 - **方式5：** 使用chain函数将单独的task和一组task进行线性连接\
 	**注：** 
 	- 各task组的task数目必须是一致的
-	- 该种方式跟cross_downstream是不一样的,cross_downstream是两个task组的task之间进行交叉连接,而chain是将两个task组的task之间进行对应位置的task进行连接
+	- 该种方式跟cross_downstream是不一样的，cross_downstream是两个task组的task之间进行交叉连接，而chain是将两个task组的task之间进行对应位置的task进行连接
 ```python
 from airflow.models.baseoperator import chain
 
@@ -109,10 +109,10 @@ chain(op1, [op2, op3], [op4, op5], op6)
 
 # 加载DAG
 Airflow通过加载python源文件来加载DAG，这些python源文件被放置在配置属性DAG_FOLDER所指定的路径下\
-Airflow会获取DAG_FOLDER下的每个文件后并执行它，然后从该文件中加载所有DAG对象\
-因此一个python文件可定义多个DAG，也一个DAG也可使用多个python文件(通过import方式整合)
+Airflow拿到DAG_FOLDER下的每个文件后并执行它，然后从该文件中加载所有DAG对象\
+因此一个python文件可定义多个DAG，一个DAG也可跨多个python文件定义(通过import方式整合)
 
-Airflow从Python文件加载DAG时，它只会提取顶级（global域）的任何DAG对象(DAG实例)
+Airflow从Python文件加载DAG时，它只会提取所有处于顶级的DAG对象(DAG实例)，即DAG对象必须定义在global域
 
 **示例:**\
 dag_1会被加载，dag_1定义在顶层(globals,即定义在全局域)\
@@ -128,11 +128,11 @@ my_function()
 
 **注：**\
 Airflow在DAG_FOLDER中搜索DAG时，Airflow仅将包含字符串airflow和dag（不区分大小写）的Python文件作为优化项考虑在内\
-要考虑所有Python文件，请禁用DAG_DISCOVERY_SAFE_MODE配置标志
+要考虑所有Python文件，请禁用DAG_DISCOVERY_SAFE_MODE配置属性
 
-可以在DAG_FOLDER或其任何子文件夹中提供一个 .airflowignore文件，该文件描述了加载器要忽略的文件模式，它涵盖了它所在的目录以及其所有子文件夹
+可以在DAG_FOLDER或其任何子文件夹中提供一个 .airflowignore文件，该文件描述了加载器要忽略的文件模式，它的作用域是它所在的目录以及其所有子文件夹
 
-当.airflowignore无法满足需求，并且希望以更灵活的方式控制Airflow是否需要解析Python文件时，可通过在配置文件中设置might_contain_dag_callable来插入可调用项\
+当.airflowignore无法满足需求，并且希望以更灵活的方式控制Airflow是否需要解析Python文件时，可通过在配置文件中设置might_contain_dag_callable来插入可调用项(一个函数)\
 该可调用项将替换默认的Airflow启发式方法，即检查Python文件中是否存在字符串airflow和dag（不区分大小写）
 ```python
 def might_contain_dag(file_path: str, zip_file: zipfile.ZipFile | None = None) -> bool:
@@ -154,7 +154,7 @@ with DAG("my_daily_dag", schedule="@daily"):
     ...
 ```
 
-schedule参数值有以下几种
+schedule参数的值有很多中，比如：
 ```pythn
 with DAG("my_daily_dag", schedule="0 0 * * *"):
     ...
@@ -168,7 +168,8 @@ with DAG("my_continuous_dag", schedule="@continuous"):
 
 ## DAG RUN
 DAG每次的执行表示一个DAG RUN\
-同一个DAG的多个DAG RUN可以并行执行，每一个DAG RUN都有自己定义的数据间隔，用于标识DAG RUN里task应操作的数据周期
+同一个DAG的多个DAG RUN可以在同一时间并行执行\
+每一个DAG RUN都有自己定义的数据间隔(数据范围)，每一个数据间隔表示DAG RUN里task应操作的数据周期
 
 比如有一个DAG每天都会处理上游在当天的数据，此时DAG的内部逻辑发生改变，需要用新的逻辑重新处理过去三个月的数据\
 此种情况，可以通过回填DAG解决，即重新执行该DAG在过去三个月里的每一天的DAG RUN\
@@ -187,7 +188,7 @@ DAG RUN有以下三个时间：
 
 
 
-# DAG分配
+# Task分配DAG
 一个Operator/Task如果要被执行，必须先为其指定一个DAG\
 以下方式可以隐式的指定DAG:
 - 在with DAG块中声明Operator/Task
@@ -197,7 +198,7 @@ DAG RUN有以下三个时间：
 以上方式除外，则必须使用dag=为Operator/Task指定DAG
 
 
-# 默认参数
+# DAG默认参数
 通常，DAG中的许多Operator/Task需要相同的默认参数集（比如retries）\
 与其为每个Operator/Task单独指定此项，不如在创建DAG时将default_args传递给DAG，它将自动将它们应用于与之绑定的任何Operator/Task
 ```python
@@ -249,7 +250,7 @@ def example_dag_decorator(email: str = "example@example.com"):
 
 example_dag = example_dag_decorator()
 ```
-除了作为一种创建DAG的新方法之外，该装饰器还会将函数中的任何参数设置为DAG参数，在触发DAG时设置这些参数\
+该种方法作为创建DAG的新方法，该装饰器还会将函数中的任何参数设置为DAG参数，在触发DAG时设置这些参数\
 然后就可以从Python代码或{{ context.params }}中访问这些参数，这些代码位于Jinja模板中
 
 注：Airflow仅加载出现在DAG文件顶层的DAG，这意味着不能仅仅使用@dag声明一个函数，还必须在DAG文件中至少调用它一次，并将其分配给顶层对象
@@ -259,14 +260,14 @@ example_dag = example_dag_decorator()
 默认情况下，DAG中的一个task仅在其所有依赖的task都成功才运行，但是有几种方法可以修改此设置
 
 - **Branching(分支):** 根据条件选择要继续执行的任务
-- **Trigger Rules(触发规则)：** 设置 DAG 运行任务的条件
+- **Trigger Rules(触发规则)：** 设置DAG运行任务的条件
 - **Setup and Teardown(设置和拆除)：** 定义设置和拆除关系
 - **Latest Only(仅最新)：** 一种特殊形式的分支，仅在针对当前运行的 DAG 运行
-- **Depends On Past(依赖过去)：** 任务可以依赖于自己从之前的运行
+- **Depends On Past(依赖过去)：** task可以依赖于它之前的执行结果
 
 
 
-## branching（分支）
+## 分支（branching）
 利用branching（分支）可以让DAG在执行task时，根据需要有选择的执行一个或多个路径的下游task
 
 分支通过@task.branch装饰器实现
@@ -336,20 +337,6 @@ class MyBranchOperator(BaseBranchOperator):
 类似于常规Python代码的@task.branch 装饰器，还有一些分支装饰器，它们使用名为 @task.branch_virtualenv 的虚拟环境或名为 @task.branch_external_python 的外部 python
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Latest Only
 DAG RUN通常针对的日期与当前日期不同， 例如，为上个月的每一天运行一个 DAG 副本以回填一些数据\
 当不希望让DAG的某些（或全部）部分针对以前日期运行，可以使用LatestOnlyOperator
@@ -404,7 +391,7 @@ task01 = EmptyOperator(task_id="task01", depends_on_past=true,dag=dag)
 
 
 
-## Trigger Rules(触发规则)
+## 触发规则(Trigger Rules)
 默认情况下，一个task会等待其所有直接上游task成功之后才运行，可以使用trigger_rule参数修改此种默认方式
 
 trigger_rule有以下选项：
@@ -505,7 +492,7 @@ Airflow提供设置和拆除task来支持此需求
 随着开发DAG，它们会变得越来越复杂，因此提供了一些方法来修改这些DAG视图，以便更易于理解
 
 
-## Task Group（任务组）
+## 任务组（Task Group）
 Task Group可用于在图形视图中将Task组织成层次组，主要用于创建重复模式和减少视觉混乱
 
 与子DAG不同，Task Group纯粹是UI分组概念\
@@ -562,7 +549,7 @@ with DAG(
 - 使用@task_group装饰器时，装饰函数的文档字符串将用作UI中的TaskGroup工具提示，但前提是未明确提供tooltip值
 
 
-## Edge Labels（边缘标签）
+## 边缘标签（Edge Labels）
 可以在图形视图中标记不同任务之间的依赖关系边缘，这对于DAG的分支区域特别有用\
 比如可以在连接下游分支的连线处标记该分支的运行的条件
 
@@ -602,6 +589,8 @@ with DAG(
     check >> Label("Errors found") >> describe >> error >> report
 ```
 
+# 子DAG
+子DAG已弃用，因此 TaskGroup 始终是首选
 
 # DAG & Task Documentation
 可以向DAG和任务对象添加文档或注释，这些文档或注释在Web界面中可见（DAG的"图形"和"树"，任务的"任务实例详细信息"）
@@ -647,6 +636,154 @@ Here's a [url](www.airbnb.com)
 """
 ```
 
+# 任务组与子DAG
+子DAG虽然与任务组具有类似的目的，但由于其实现，引入了性能和功能问题
+
+SubDagOperator启动一个BackfillJob，它会忽略现有的并行配置，从而可能过度订阅工作器环境
+
+子DAG具有自己的DAG属性
+当子DAG属性与其父DAG不一致时，可能会出现意外行为
+
+无法在一个视图中看到"完整"的DAG，因为子DAG作为一个完全成熟的DAG存在
+
+子DAG引入了各种边缘情况和注意事项，这可能会破坏用户体验和期望
+
+另一方面，任务组是一个更好的选择，因为它纯粹是一个UI分组概念
+任务组中的所有任务仍然像任务组外的任何其他任务一样运行
+
+
+| 任务组      | 子DAG |
+| ----------- | ----------- |
+| 重复模式作为同一 DAG 的一部分  | 重复模式作为单独的 DAG    |
+| DAG的一组视图和统计信息      | 父DAG和子DAG之间的一组独立的视图和统计信息    |
+| 一组DAG配置    | 多组 DAG 配置       |
+| 通过现有的SchedulerJob尊重并行配置    | 由于新产生的 BackfillJob，不尊重并行配置    |
+| 使用上下文管理器进行简单的构造声明      | 具有命名限制的复杂DAG工厂   |
+
+
+# 打包DAG
+DAG通常仅在一个Python文件中，但有些复杂的DAG可能分布在多个文件中并具有应该与它们一起发布的依赖项（"供应商"）
+
+可以将所有内容都放在标准文件系统布局的DAG_FOLDER中，也可以将DAG及其所有 Python 文件打包为一个zip文件\
+例如，可以将两个DAG以及它们需要的依赖项打包为一个zip文件，内容如下
+```text
+my_dag1.py
+my_dag2.py
+package1/__init__.py
+package1/functions.py
+```
+
+
+注:
+- 如果启用了序列化，则无法使用它们
+- 它们不能包含编译库（例如 libz.so），只能包含纯 Python
+- 它们将被插入Python的sys.path中，并且可以通过Airflow进程中的任何其他代码导入，因此请确保包名称不会与系统上已安装的其他包冲突
+
+一般来说，如果有一组复杂的编译依赖项和模块，那么最好使用Python virtualenv系统，并使用pip在目标系统上安装必要的包
+
+
+# .airflowignore
+.airflowignore文件指定了DAG_FOLDER或PLUGINS_FOLDER中Airflow应有意忽略的目录或文件\
+Airflow支持以下两种文件模式的语法风格，它指定在DAG_IGNORE_FILE_SYNTAX中（在 Airflow 2.3 中添加）
+- regexp
+- glob
+
+一个.airflowignore文件的作用域是它所在的目录及其所有子文件夹
+也可以在子文件夹里放置 .airflowignore文件，这样子文件夹及其子子文件夹就会适用
+
+## regexp
+默认的DAG_IGNORE_FILE_SYNTAX是regexp，以确保向后兼容性
+
+对于regexp模式语法（默认），.airflowignore中的每一行都指定一个正则表达式模式，并且名称（不是DAG ID）与任何模式匹配的目录或文件都将被忽略（本质上，Pattern.search() 用于匹配模式）\
+使用#字符表示注释，以#开头的行上的所有字符都将被忽略
+
+与Airflow中大多数正则表达式匹配一样，正则表达式引擎是re2，它明确不支持许多高级功能
+
+## glob
+使用glob语法，模式的工作方式就像 .gitignore 文件中的模式一样
+- 字符 * 将匹配任意数量的字符，除了 /
+- 字符 ? 将匹配任何单个字符，除了 /
+- 范围符号，例如 [a-zA-Z]，可用于匹配范围内的某个字符
+- 可以通过添加前缀 ! 来否定模式。模式按顺序评估，因此否定可以覆盖同一文件中先前定义的模式或父目录中定义的模式。
+- 双星 (**) 可用于跨目录匹配。例如，**/__pycache__/ 将忽略每个子目录中无限深度的 __pycache__ 目录。
+- 如果模式的开头或中间（或两者）有 /，则该模式相对于 .airflowignore 文件本身的目录级别。否则，该模式还可以在 .airflowignore 级别以下的任何级别匹配
+
+## 示例
+应该将 .airflowignore文件放在DAG_FOLDER中
+例如，可以使用regexp语法准备一个 .airflowignore 文件，内容如下
+```python
+project_a
+tenant_[\d]
+```
+或者，等效地，使用glob语法
+```python
+**/*project_a*
+tenant_[0-9]*
+```
+
+然后， DAG_FOLDER中的类似以下文件将被忽略（如果目录的名称与任何模式匹配，则Airflow根本不会扫描此目录及其所有子文件夹，这提高了查找 DAG 的效率）
+- project_a_dag_1.py
+- TESTING_project_a.py
+- tenant_1.py
+- project_a/dag_1.py
+- tenant_1/dag_1.py 
+
+
+# DAG依赖
+在Airflow 2.1中添加
+
+DAG中task之间的依赖关系通过上游和下游关系明确定义，DAG之间的依赖关系则稍微复杂一些\
+通常，一个DAG可以通过以下两种方式依赖另一个DAG
+- **触发:** TriggerDagRunOperator
+- **等待:** ExternalTaskSensor
+
+另一个困难在于，一个 DAG 可以等待或触发另一个 DAG 的多次运行，并且数据间隔不同\
+DAG依赖视图可以通过以下导航查看，有助于可视化 DAG 之间的依赖关系
+- 菜单 -> 浏览 -> DAG 依赖\
+依赖关系由scheduler在DAG序列化期间计算，Web服务器使用它们来构建依赖关系图
+
+依赖关系检测器是可配置的，因此可以实现与 DependencyDetector 中的默认值不同的逻辑
+
+
+
+# DAG 暂停、停用和删除
+DAG在未运行时会有多种状态，比如以下几种状态：
+- 暂停(pause)
+- 停用(deactivate)
+- 删除(删除DAG及其所有元数据)
+
+当DAG存在于DAGS_FOLDER中时，scheduler会扫描DAG文件并将它存储在数据库中，通常用户都是通过操作UI界面的方式（执行Pause操作）来禁止使用DAG的
+
+## 暂停(Pause)
+通过UI和API，可以对DAG执行pause和unpause操作\
+已pause的DAG不会由scheduler调度，但可以通过UI手动触发执行
+
+在UI中可以看到已Paused的DAG（在Paused选项卡）\
+在UI中可以看到已取消Paused的DAG（在Active选项卡）
+
+当一个DAG正在running时，此时如果执行Pause，则所有正在running的task会继续执行直至完成，所有下游未执行的task会被标记状态为scheduled，且不会继续被执行\
+当一个DAG从Paused状态变成unPause时，所有被标记为scheduled的task会根据逻辑继续执行，没有被标记为scheduled的task的dag将根据预先定义的时间执行
+
+## 停用(deactivate)
+通过从DAGS_FOLDER中删除DAG文件来停用(deactivate)DAG\
+停用(deactivate)的DAG跟UI界面中的paused选项卡里的DAG是不一样的，前者是DAG文件被删除并停止使用，后者是DAG处于激活状态，只是当前被pause了\
+当scheduler扫描解析DAGS_FOLDER里的DAG文件时，如果没有找到它之前扫描解析并存储在数据库中的DAG，它将被设置为已停用(deactivated)\
+停用的DAG的元数据和历史记录将被保留，当DAG重新添加到DAGS_FOLDER中时，它将再次被激活，并且历史记录将可见，即当scheduler停用DAG时，不会丢失其历史运行的任何数据
+
+用户是无法通过UI界面或API来activate/deactivate一个DAG的，只能通过从DAGS_FOLDER中删除文件来完成\
+请注意，Airflow UI中的Active选项卡里的DAG指的是既是Activated同时也是Not paused的DAG
+
+UI界面中是无法看到已停用的DAG，但有时可能会看到历史运行，但当尝试查看有关这些运行的信息时，会看到DAG丢失的错误
+
+## 删除
+可以使用UI或API从元数据数据库中删除DAG元数据，但它并不总是会导致DAG从UI中消失\
+如果在删除元数据时，DAG仍位于DAGS_FOLDER中，则DAG将重新出现，因为scheduler会定期扫描解析DAGS_FOLDER文件夹，所以删除元数据只会删除DAG的历史运行信息
+
+
+彻底删除DAG及其所有历史元数据，需依次执行以下三步：
+- 暂停DAG(pause)
+- 通过UI或API从数据库中删除历史元数据
+- 从DAGS_FOLDER中删除DAG文件，并等到它变为inactive状态
 
 
 # DAG自动暂停
