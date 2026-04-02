@@ -95,47 +95,47 @@ print(response['structured_response'])
 #     weather_conditions=None
 # )
 ```
-代码里无需显式指定integration，后台会在指定model时自定分析匹配
+代码里无需显式指定integration，后台会在指定model时自定分析匹配\
 过程大致如下：
 1) 框架内部有一个“模型路由/注册表”（registry）
-2) 根据create_agent传入的model参数，去匹配是哪个provider
+2) 根据create_agent传入的model参数，去匹配是哪个provider\
    比如，如果是gpt-5，则是OpenAI，如果是claude-sonnet-4-6，则是Anthropic 
 3) 内部会调用对应Provider的Integration包
 
 
 示例主要涉及以下Agent部分：
-- System Prompt
-  用来定义agent的角色和行为
+- System Prompt\
+  用来定义agent的角色和行为\
   它的描述一定要具体且可执行，比如针对Tool函数的相关描述
 
 
-- Tool
-  Tool就是自定义的函数，可以让LLM跟外部系统交互
+- Tool\
+  Tool就是自定义的函数，可以让LLM跟外部系统交互\
   在System prompt要对Tool函数进行详细描述，包括函数名，参数，以及何时调用，这样LLM就可以更好的调用Tool函数了
 
-  在Tool函数加装饰器@Tool后, 函数就可以接收参数 "runtime: ToolRuntime[自定义类型]"
-  函数体内，通过ToolRuntime[自定义类型]类型参数，获取一些meta和上下文信息，用于函数体内的逻辑实现
+  在Tool函数加装饰器@Tool后, 函数就可以接收参数 "runtime: ToolRuntime[自定义类型]"\
+  函数体内，通过ToolRuntime[自定义类型]类型参数，获取一些meta和上下文信息，用于函数体内的逻辑实现\
   该示例中，自定义了一个类型Context，那么参数就可以写成runtime: ToolRuntime[Context]，然后runtime.context的返回值就是自定义类型Context的一个实例
 
-  Tool函数的参数既可以是自定义的，也可以是使用ToolRuntime[Context]，也可以混合使用(ToolRuntime类型参数必须是第一个位置)
-  它们的区别在于，自定义参数的值，是LLM分析了user发给LLM的message后得到，然后传给函数的（经过LLM）
+  Tool函数的参数既可以是自定义的，也可以是使用ToolRuntime[Context]，也可以混合使用(ToolRuntime类型参数必须是第一个位置)\
+  它们的区别在于，自定义参数的值，是LLM分析了user发给LLM的message后得到，然后传给函数的（经过LLM）\
   ToolRuntime[自定义类型]类型参数无需经由LLM分析，是由 LangChain 运行时注入（没经过LLM）
 
   函数体内，也可以跟agent Memory进行交互
 
 
-- Model 
-  通过Model设置LLM参数
-  不同Provider的LLM，需要配置的参数可能各不相同
+- Model\
+  通过Model设置LLM参数\
+  不同Provider的LLM，需要配置的参数可能各不相同\
   这里面，使用init_chat_model创建了一个"claude-sonnet-4-6" model, langchain后台会调用anthropic 的integration
 
 
-- Response Format
-  可以对LLM的返回值定义严格的format
+- Response Format\
+  可以对LLM的返回值定义严格的format\
   比如format可以是一个字典对象，包含一些自定义的字段，然后可以让LLM将输出按照这种事先定义好的format返回给agent
 
 
-- Memory
-  可以在Model里为agent指定一个memory对象，用于可以记录和维护每次与LLM对话的状态信息
-  Agent执行结束后，Memory就会被清除
+- Memory\
+  可以在Model里为agent指定一个memory对象，用于可以记录和维护每次与LLM对话的状态信息\
+  Agent执行结束后，Memory就会被清除\
   生产环境，建议设置为持久存储，比如DB
