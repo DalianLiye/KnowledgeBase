@@ -1,0 +1,141 @@
+示例
+```python
+from dataclasses import dataclass
+
+from langchain.agents import create_agent
+from langchain.chat_models import init_chat_model
+from langchain.tools import tool, ToolRuntime
+from langgraph.checkpoint.memory import InMemorySaver
+from langchain.agents.structured_output import ToolStrategy
+
+
+# Define system prompt
+SYSTEM_PROMPT = """You are an expert weather forecaster, who speaks in puns.
+
+You have access to two tools:
+
+- get_weather_for_location: use this to get the weather for a specific location
+- get_user_location: use this to get the user's location
+
+If a user asks you for the weather, make sure you know the location. If you can tell from the question that they mean wherever they are, use the get_user_location tool to find their location."""
+
+# Define context schema
+@dataclass
+class Context:
+    """Custom runtime context schema."""
+    user_id: str
+
+# Define tools
+@tool
+def get_weather_for_location(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
+
+@tool
+def get_user_location(runtime: ToolRuntime[Context]) -> str:
+    """Retrieve user information based on user ID."""
+    user_id = runtime.context.user_id
+    return "Florida" if user_id == "1" else "SF"
+
+# Configure model
+model = init_chat_model(
+    "claude-sonnet-4-6",
+    temperature=0
+)
+
+# Define response format
+@dataclass
+class ResponseFormat:
+    """Response schema for the agent."""
+    # A punny response (always required)
+    punny_response: str
+    # Any interesting information about the weather if available
+    weather_conditions: str | None = None
+
+# Set up memory
+checkpointer = InMemorySaver()
+
+# Create agent
+agent = create_agent(
+    model=model,
+    system_prompt=SYSTEM_PROMPT,
+    tools=[get_user_location, get_weather_for_location],
+    context_schema=Context,
+    response_format=ToolStrategy(ResponseFormat),
+    checkpointer=checkpointer
+)
+
+# Run agent
+# `thread_id` is a unique identifier for a given conversation.
+config = {"configurable": {"thread_id": "1"}}
+
+response = agent.invoke(
+    {"messages": [{"role": "user", "content": "what is the weather outside?"}]},
+    config=config,
+    context=Context(user_id="1")
+)
+
+print(response['structured_response'])
+# ResponseFormat(
+#     punny_response="Florida is still having a 'sun-derful' day! The sunshine is playing 'ray-dio' hits all day long! I'd say it's the perfect weather for some 'solar-bration'! If you were hoping for rain, I'm afraid that idea is all 'washed up' - the forecast remains 'clear-ly' brilliant!",
+#     weather_conditions="It's always sunny in Florida!"
+# )
+
+
+# Note that we can continue the conversation using the same `thread_id`.
+response = agent.invoke(
+    {"messages": [{"role": "user", "content": "thank you!"}]},
+    config=config,
+    context=Context(user_id="1")
+)
+
+print(response['structured_response'])
+# ResponseFormat(
+#     punny_response="You're 'thund-erfully' welcome! It's always a 'breeze' to help you stay 'current' with the weather. I'm just 'cloud'-ing around waiting to 'shower' you with more forecasts whenever you need them. Have a 'sun-sational' day in the Florida sunshine!",
+#     weather_conditions=None
+# )
+```
+代码里无需显式指定integration，后台会在指定model时自定分析匹配
+过程大致如下：
+1) 框架内部有一个“模型路由/注册表”（registry）
+2) 根据create_agent传入的model参数，去匹配是哪个provider
+   比如，如果是gpt-5，则是OpenAI，如果是claude-sonnet-4-6，则是Anthropic 
+3) 内部会调用对应Provider的Integration包
+
+
+示例主要涉及以下Agent部分：
+- System Prompt
+  用来定义agent的角色和行为
+  它的描述一定要具体且可执行，比如针对Tool函数的相关描述
+
+
+- Tool
+  Tool就是自定义的函数，可以让LLM跟外部系统交互
+  在System prompt要对Tool函数进行详细描述，包括函数名，参数，以及何时调用，这样LLM就可以更好的调用Tool函数了
+
+  在Tool函数加装饰器@Tool后, 函数就可以接收参数 "runtime: ToolRuntime[自定义类型]"
+  函数体内，通过ToolRuntime[自定义类型]类型参数，获取一些meta和上下文信息，用于函数体内的逻辑实现
+  该示例中，自定义了一个类型Context，那么参数就可以写成runtime: ToolRuntime[Context]，然后runtime.context的返回值就是自定义类型Context的一个实例
+
+  Tool函数的参数既可以是自定义的，也可以是使用ToolRuntime[Context]，也可以混合使用(ToolRuntime类型参数必须是第一个位置)
+  它们的区别在于，自定义参数的值，是LLM分析了user发给LLM的message后得到，然后传给函数的（经过LLM）
+  ToolRuntime[自定义类型]类型参数无需经由LLM分析，是由 LangChain 运行时注入（没经过LLM）
+
+  函数体内，也可以跟agent Memory进行交互
+
+
+- Model 
+  通过Model设置LLM参数
+  不同Provider的LLM，需要配置的参数可能各不相同
+  这里面，使用init_chat_model创建了一个"claude-sonnet-4-6" model, langchain后台会调用anthropic 的integration
+
+
+- Response Format
+  可以对LLM的返回值定义严格的format
+  比如format可以是一个字典对象，包含一些自定义的字段，然后可以让LLM将输出按照这种事先定义好的format返回给agent
+
+
+- Memory
+  可以在Model里为agent指定一个memory对象，用于可以记录和维护每次与LLM对话的状态信息
+  Agent执行结束后，Memory就会被清除
+  生产环境，建议设置为持久存储，比如DB
