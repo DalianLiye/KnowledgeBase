@@ -3,10 +3,13 @@
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
-from langchain.chat_models import init_chat_model
+from langchain_openai import ChatOpenAI  # 改用这个调用 DeepSeek
 from langchain.tools import tool, ToolRuntime
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents.structured_output import ToolStrategy
+from dotenv import load_dotenv  
+load_dotenv()                   
+import os
 
 
 # Define system prompt
@@ -37,9 +40,13 @@ def get_user_location(runtime: ToolRuntime[Context]) -> str:
     user_id = runtime.context.user_id
     return "Florida" if user_id == "1" else "SF"
 
-# Configure model
-model = init_chat_model(
-    "claude-sonnet-4-6",
+# ========================
+# 这里替换成 DeepSeek 模型
+# ========================
+model = ChatOpenAI(
+    model="deepseek-chat",               # DeepSeek 模型名
+    api_key=os.getenv("DEEPSEEK_API_KEY"),     # 填入你的 API Key
+    base_url="https://api.deepseek.com/v1",
     temperature=0
 )
 
@@ -47,9 +54,7 @@ model = init_chat_model(
 @dataclass
 class ResponseFormat:
     """Response schema for the agent."""
-    # A punny response (always required)
     punny_response: str
-    # Any interesting information about the weather if available
     weather_conditions: str | None = None
 
 # Set up memory
@@ -66,7 +71,6 @@ agent = create_agent(
 )
 
 # Run agent
-# `thread_id` is a unique identifier for a given conversation.
 config = {"configurable": {"thread_id": "1"}}
 
 response = agent.invoke(
@@ -76,13 +80,8 @@ response = agent.invoke(
 )
 
 print(response['structured_response'])
-# ResponseFormat(
-#     punny_response="Florida is still having a 'sun-derful' day! The sunshine is playing 'ray-dio' hits all day long! I'd say it's the perfect weather for some 'solar-bration'! If you were hoping for rain, I'm afraid that idea is all 'washed up' - the forecast remains 'clear-ly' brilliant!",
-#     weather_conditions="It's always sunny in Florida!"
-# )
 
-
-# Note that we can continue the conversation using the same `thread_id`.
+# Continue conversation
 response = agent.invoke(
     {"messages": [{"role": "user", "content": "thank you!"}]},
     config=config,
@@ -90,10 +89,6 @@ response = agent.invoke(
 )
 
 print(response['structured_response'])
-# ResponseFormat(
-#     punny_response="You're 'thund-erfully' welcome! It's always a 'breeze' to help you stay 'current' with the weather. I'm just 'cloud'-ing around waiting to 'shower' you with more forecasts whenever you need them. Have a 'sun-sational' day in the Florida sunshine!",
-#     weather_conditions=None
-# )
 ```
 代码里无需显式指定integration，后台会在指定model时自定分析匹配\
 过程大致如下：
