@@ -3,12 +3,12 @@
 from dataclasses import dataclass
 
 from langchain.agents import create_agent
-from langchain_openai import ChatOpenAI  # 改用这个调用 DeepSeek
+from langchain_openai import ChatOpenAI
 from langchain.tools import tool, ToolRuntime
 from langgraph.checkpoint.memory import InMemorySaver
 from langchain.agents.structured_output import ToolStrategy
-from dotenv import load_dotenv  
-load_dotenv()                   
+from dotenv import load_dotenv
+load_dotenv()
 import os
 
 
@@ -41,11 +41,11 @@ def get_user_location(runtime: ToolRuntime[Context]) -> str:
     return "Florida" if user_id == "1" else "SF"
 
 # ========================
-# 这里替换成 DeepSeek 模型
+# DeepSeek 模型
 # ========================
 model = ChatOpenAI(
-    model="deepseek-chat",               # DeepSeek 模型名
-    api_key=os.getenv("DEEPSEEK_API_KEY"),     # 填入你的 API Key
+    model="deepseek-chat",
+    api_key=os.getenv("DEEPSEEK_API_KEY"),
     base_url="https://api.deepseek.com/v1",
     temperature=0
 )
@@ -93,18 +93,19 @@ print(response['structured_response'])
 代码里无需显式指定integration，后台会在指定model时自定分析匹配\
 过程大致如下：
 1) 框架内部有一个“模型路由/注册表”（registry）
-2) 根据create_agent传入的model参数，去匹配是哪个provider\
-   比如，如果是gpt-5，则是OpenAI，如果是claude-sonnet-4-6，则是Anthropic 
+2) 根据create_agent传入的model字符串名称参数，去匹配是哪个provider\
+   比如，如果是gpt-5，则是OpenAI，如果是claude-sonnet-4-6，则是Anthropic\
+   由于该例是直接传入的ChatOpenAI对象，因此后台自动匹配OpenAI
 3) 内部会调用对应Provider的Integration包
 
 
-示例主要涉及以下Agent部分：
-- System Prompt\
+示例涉及以下Agent核心部分：
+- **System Prompt**\
   用来定义agent的角色和行为\
   它的描述一定要具体且可执行，比如针对Tool函数的相关描述
 
 
-- Tool\
+- **Tool**\
   Tool就是自定义的函数，可以让LLM跟外部系统交互\
   在System prompt要对Tool函数进行详细描述，包括函数名，参数，以及何时调用，这样LLM就可以更好的调用Tool函数了
 
@@ -119,18 +120,18 @@ print(response['structured_response'])
   函数体内，也可以跟agent Memory进行交互
 
 
-- Model\
+- **Model**\
   通过Model设置LLM参数\
   不同Provider的LLM，需要配置的参数可能各不相同\
-  这里面，使用init_chat_model创建了一个"claude-sonnet-4-6" model, langchain后台会调用anthropic 的integration
+  示例中使用ChatOpenAI创建DeepSeek模型，LangChain会通过OpenAI协议适配器调用模型
 
 
-- Response Format\
+- **Response Format**\
   可以对LLM的返回值定义严格的format\
   比如format可以是一个字典对象，包含一些自定义的字段，然后可以让LLM将输出按照这种事先定义好的format返回给agent
 
 
-- Memory\
+- **Memory**\
   可以在Model里为agent指定一个memory对象，用于可以记录和维护每次与LLM对话的状态信息\
-  Agent执行结束后，Memory就会被清除\
+  InMemorySaver会在程序结束后清除，不是Agent结束\
   生产环境，建议设置为持久存储，比如DB
