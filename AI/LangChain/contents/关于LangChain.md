@@ -41,7 +41,7 @@ LangChain是开源框架，内置了Agent构建能力，可集成各类主流模
 - LangChain → 依赖 → LangChain Core + LangGraph
 
 # 示例
-以下是一个简单的示例
+示例1：claude交互
 ```python
 # pip install -qU langchain "langchain[anthropic]"
 from langchain.agents import create_agent
@@ -60,4 +60,32 @@ agent = create_agent(
 agent.invoke(
     {"messages": [{"role": "user", "content": "what is the weather in sf"}]}
 )
+```
+
+示例2：deepseek交互
+```python
+# pip install -qU langchain langchain-openai
+from langchain.agents import create_agent
+from langchain_openai import ChatOpenAI
+
+def get_weather(city: str) -> str:
+    """Get weather for a given city."""
+    return f"It's always sunny in {city}!"
+
+agent = create_agent(
+    # 只替换这里！
+    model=ChatOpenAI(
+        model="deepseek-chat",
+        api_key="XXXXXXXXXXXX",
+        base_url="https://api.deepseek.com/v1"
+    ),
+    tools=[get_weather],
+    system_prompt="You are a helpful assistant",
+)
+
+response = agent.invoke({
+    "messages": [{"role": "user", "content": "what is the weather in sf"}]
+})
+
+print(response)
 ```
