@@ -1,10 +1,9 @@
 [目录](../目录.md)
 
 # 关于LangChain
-LangChain是一个开源的框架，内置了构建Agent的能力和体系，并且可以和很多模型或工具集成\
-LangChain可以通过少量的代码，构建自定义agent和application\
-LangChain可以和很多模型交互，涵盖了当前主流的模型，比如OpenAI, Anthropic, Google\
-LangChain也提供了很多已经封装好的相关provider的Integration，这些Integration提供了很多额外的能力，比如访问外部资源的能力，包括google search, 各种数据库连接，SaaS集成等等
+LangChain是开源框架，内置了Agent构建能力，可集成各类主流模型（如 OpenAI、Anthropic、Google）与工具\
+通过少量代码即可搭建自定义Agent和应用\
+还提供封装好的集成模块，支持访问搜索、数据库、SaaS 等外部资源
 
 
 # LangChain核心优势：
