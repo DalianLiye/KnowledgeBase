@@ -1,4 +1,6 @@
-示例
+[目录](../目录.md)
+
+# 示例
 ```python
 from dataclasses import dataclass
 
@@ -90,6 +92,8 @@ response = agent.invoke(
 
 print(response['structured_response'])
 ```
+
+# 说明
 代码里无需显式指定integration，后台会在指定model时自定分析匹配\
 过程大致如下：
 1) 框架内部有一个“模型路由/注册表”（registry）
