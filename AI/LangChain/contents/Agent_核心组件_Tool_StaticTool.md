@@ -1,12 +1,20 @@
-Static tool就是创建Agent时指定tool后，tool在agent整个生命周期内都不会改变\
-Static tool是最普遍，最直接的一种指定tool的方式\
-创建agent时，指定一个Tool函数列表[Tool1, Tool2,...], 如果列表为空，以为这agent仅仅是绑定了LLM，没有tool calling能力
+[目录](../目录.md)
 
-Tool既可以是普通的python函数，也可以是python coroutines
+
+# 关于Static Tool
+Static tool指Agent创建时指定工具列表，生命周期内固定不变，是最常用的工具配置方式\
+传入工具列表为空时，Agent仅绑定LLM，不具备工具调用能力\
+Tool支持普通Python函数与协程（coroutines）
+
+# 示例
+
+示例1：绑定工具
+示例1：
 ```python
 from langchain.tools import tool
 from langchain.agents import create_agent
-
+from dotenv import load_dotenv  
+load_dotenv()  
 
 @tool
 def search(query: str) -> str:
@@ -18,10 +26,11 @@ def get_weather(location: str) -> str:
     """Get weather information for a location."""
     return f"Weather in {location}: Sunny, 72°F"
 
-agent = create_agent(model, tools=[search, get_weather])
+agent = create_agent("openai:gpt-5", tools=[search, get_weather])
 ```
 
-当用@Tool装饰一个函数时，不只是简单地把它标记为“工具”，还可以在装饰器里顺带配置这个工具的名字、描述、参数结构等信息，方便 LLM 更好地理解、选择、和调用这个工具
+示例2：添加工具元数据
+当用@Tool装饰一个函数时，不只是简单地把它标记为“工具”，还可以在装饰器里顺带配置这个工具的名字、描述、参数结构等信息，方便model更好地理解、选择、和调用这个工具
 ```python
 from typing import TypedDict
 from langchain.tools import tool
@@ -37,17 +46,19 @@ def weather_tool(city: str, unit: str = "celsius") -> str:
 ```
 
 @tool装饰器这些属性字段是装饰器里预置的
-- name\
-  函数名叫 get_weather，但对 LLM 暴露的工具名是 "weather_lookup"，也就是说，模型在“tool calls”协议里，会看到 weather_lookup 这个名字，而不是 get_weather
+- **name**\
+  函数名叫get_weather，但对model暴露的工具名是"weather_lookup"\
+  即模型在“tool calls”协议里，会看到weather_lookup这个名字，而不是 get_weather
 
-- description\
+- **description**\
   提供了一句中文描述：查询指定城市的当前天气信息\
-  LLM 会根据描述，决定何时调用这个工具（这对工具路由很重要）
+  model会根据描述，决定何时调用这个工具（这对工具路由很重要）
 
-- args_schema\
-  参数 schema 按定义的 TypedDict 来，可以精确控制传入参数的字段名、类型等
+- **args_schema**\
+  参数 schema 按定义的\
+  args_schema 用于定义工具的输入参数结构，支持Pydantic model或TypedDict\
+  脚本里是TypedDict，可以精确控制传入参数的字段名、类型等
 
-
-
-这些描述信息也可以加载system prompt里，但写在装饰器里会有强约束力，更加稳定，因为它是langchain框架支持的\
-而写在system prompt里，其实是用来LLM的分析理解能力，约束力不强，不会特别稳定
+注：\
+这些属性信息也可以加载system prompt里，但写在装饰器里会有强约束力，更加稳定，因为它是langchain框架支持的\
+而写在system prompt里，其实是用来model的分析理解能力，约束力不强，不会特别稳定

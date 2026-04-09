@@ -1,17 +1,21 @@
-# 关于Dyanamic Tool
-Dynamic tool就是agent可以在运行时，动态选择执行合适的Tool\
-关于Dynamic Tool，有以下两种实现方式
-- Filtering pre-registered tools (前提：预先知道所有Tool,并注册)
-- Runtime tool registration
+[目录](../目录.md)
+
+
+# 关于Dynamic Tool
+Dynamic tool是指Agent可以在运行时，动态选择并执行合适的工具
+
+Dynamic Tool有两种实现方式：
+- Filtering pre-registered tools（预先注册所有工具，运行时动态筛选）
+- Runtime tool registration（运行时动态注册新工具）
 
 
 ## Filter Pre-Registered Tools
-就是agent创建时，把所有的Tool都注册了，然后在agent运行时动态的把合适的Tool筛出来使用
+Agent创建时预先注册全部工具，运行时根据状态、权限、配置动态筛选可用工具
 
-Filter Pre-Registered Tools 适用于以下场景：
-- 所有的Tool都是事先预知的
-- 根据条件动态的筛选Tool
-- Tool是静态的，但它们是否可用是动态的
+适用场景：
+- 所有工具预先可知
+- 根据条件动态启用/禁用工具
+- 工具本身固定，但可用性动态变化
 
 示例1：根据state动态选择Tool
 ```python
@@ -147,17 +151,17 @@ agent = create_agent(
 
 
 ## Runtime tool registration
-就是在Agent运行过程中，动态的注册并处理Tool的执行
+在Agent运行过程中动态注册、加载、执行工具
 
-动态注册并执行Tool，需要通过以下两个hook实现：
-- wrap_model_call ： 将Dynamic Tool加入请求，即将Dynamic Tool注册到请求里
-- wrap_tool_call：处理Dynamic Tool的执行，即指定Dynamic Tool由具体哪一个函数执行
-注：wrap_tool_call hook是运行时注册Tool所必需的，因为agent需要知道如何具体哪一个函数来执行Tool，没有它，Agent将不知道如何执行这个Tool
+需要通过两个hook实现：
+- wrap_model_call：将动态工具加入请求，即将Dynamic Tool注册到请求里
+- wrap_tool_call：指定动态工具的执行函数，即指定Dynamic Tool由具体哪一个函数执行
+注：wrap_tool_call是必需的，因为Agent需要知道工具对应的具体执行函数，否则无法运行工具是
 
-Runtime tool registration适用于以下场景：
-1) Tool在运行时被发现，比如从MCP服务器
-2) Tool根据用户数据或配置动态生成
-3) 对接外部Tool目录/注册表中心
+适用场景：
+1) 工具从MCP服务器等外部服务动态发现
+2) 工具根据用户配置动态生成
+3) 统一工具注册中心，多团队共享管理
    例如，一个公司很多team都有自己的agent，如果没有这个Tool目录/注册表中心，那么需要每一个team的agent都要有自己的注册的Tool以及对应的函数实现，不便于管理\
    有了这个外部的统一的Tool目录/注册中心，它提供统一管理的Tool列表以及具体实现 (endpoint)\
    那么各个team就可以从这个中心获取获取Tool ，然后注册给自己的agent(通过wrap_model_call hook), 再将具体的实现函数(通过wrap_tool_call hook)\
