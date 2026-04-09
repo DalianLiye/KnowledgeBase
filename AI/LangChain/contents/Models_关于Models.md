@@ -1,9 +1,13 @@
-Model除了生成像人一样翻译，总结，会话，还可以做以下task：
-- Tool Calling
-- Structured output
-- Multimodality
-- Reasoning
+[目录](../目录.md)
 
-不同的Model擅长的领域也不一样\
-Langchain提供了一个标准接口对接不同的model\
-可以使agent根据需要，在不同的Model间切换
+
+# 关于Models
+
+大模型除了实现翻译、总结、对话等类人交互能力外，还支持以下核心任务：
+- Tool Calling：工具调用
+- Structured Output：结构化输出
+- Multimodality：多模态处理
+- Reasoning：逻辑推理
+
+不同模型在各领域的能力各有侧重\
+LangChain提供统一标准接口，可对接各类模型，让Agent能根据需求灵活切换不同模型，适配不同任务场景

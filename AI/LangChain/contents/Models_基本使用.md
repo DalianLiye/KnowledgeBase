@@ -1,21 +1,24 @@
+[目录](../目录.md)
+
+
 # 基本使用
 Model可以通过以下两种方式使用：
-- With agent\
-  可以在创建agent时动态指定model\
-  model可以在复杂的“基于 agent 的工作流”中调用
+- **With agent**\
+  创建Agent时动态指定Model，Model可在复杂的Agent工作流中被调用
 
-- Standalone\
-  可以直接单次调用model，无需agent framework做循环处理\
-  例如直接生成文本、做分类或抽取信息
+- **Standalone**\
+  直接单次调用Model，无需Agent框架的循环处理，适用于生成文本、分类、信息抽取等场景
 
 
 # 初始化model
-通过以下两种方式初始化model：
-- chat model class\
-  如果要初始化一个standalone model，通过init_chat_model方式最简单，最直接
-- provider model class
-  
-示例：langchain提供的标准接口初始化model
+
+两种方式：
+- **chat model class**\
+  初始化Standalone Model最简单直接的方式：使用 init_chat_model
+- **provider model class**\
+  使用各厂商提供的原生Model类
+
+示例：使用LangChain标准接口初始化Model
 ```python
 import os
 from langchain.chat_models import init_chat_model
@@ -27,7 +30,7 @@ model = init_chat_model("gpt-5.2")
 response = model.invoke("Why do parrots talk?")
 ```
 
-示例：通过provider提供的原生方式初始化model
+示例：通过Provider原生方式初始化Model
 ```python
 import os
 from langchain_openai import ChatOpenAI
@@ -40,20 +43,21 @@ response = model.invoke("Why do parrots talk?")
 ```
 
 # 支持的Model
-Langchain支持所有当前主流的provider的model\
-每个provider提供的model的能力也各不相同
+LangChain支持当前所有主流厂商模型，不同厂商提供的模型能力各有差异
 
-# Key Method
-model主要包括以下关键的方法：
 
-- invoke\
-  向model提交message作为输入，然后生成response后返回输出
+# 核心方法
+Model包含以下核心方法：
 
-- stream\
-  调用model时，实时返回正在生成的结果
+- **invoke**\
+  提交消息输入，等待生成完成后返回完整响应
 
-- batch\
-  同时向model批量发送多个请求，这样可以提高处理效率
+- **stream**\
+  调用model时，实时流式返回响应内容
 
-除了聊天（对话）模型之外，LangChain 还支持其它相关技术\
-例如用于生成向量表示的 embedding 模型和用于存储与检索这些向量的向量数据库（vector store）
+- **batch**\
+  同时向model批量发送多个请求，提升处理效率
+
+除聊天模型外，LangChain 还支持相关技术体系\
+例如：用于生成向量表示的Embedding模型，以及用于存储和检索向量的向量数据库（Vector Store）
+

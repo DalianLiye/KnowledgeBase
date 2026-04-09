@@ -1,20 +1,30 @@
+[目录](../目录.md)
+
+
 # 关于模型调用
-chat model的调用有以下几种方法：
+Chat Model提供三种核心调用方式：
 - invoke
 - stream
 - batch
 
 
 ## invoke()
-可以通过invoke()方法发送一个或一组message到模型，然后模型将所有结果一次性全部输出返回
+通过invoke()方法可以发送单条或一组消息给模型，等待全部生成完成后一次性返回结果
 
-示例：发送一个message
+支持三种输入格式：
+- 字符串（单条用户消息）
+- 字典数组（对话历史）
+- Message对象数组（SystemMessage / HumanMessage / AIMessage）
+
+
+示例：发送字符串
 ```python
 response = model.invoke("Why do parrots have colorful feathers?")
 print(response)
 ```
 
-示例：发送一组message，可以用来代表历史聊天记录\
+示例：发送字典数组\
+可以用来代表历史聊天记录\
 每一个message都有一个role，模型可以用来判断是谁发出的
 ```python
 conversation = [
@@ -28,7 +38,7 @@ response = model.invoke(conversation)
 print(response)  # AIMessage("J'adore créer des applications.")
 ```
 
-示例：发送一组message，可以通过Messge对象封装各个message
+示例：发送Message对象数组，通过Messge对象封装各个message
 ```python
 from langchain.messages import HumanMessage, AIMessage, SystemMessage
 
@@ -44,10 +54,10 @@ print(response)  # AIMessage("J'adore créer des applications.")
 ```
 
 
-
 ## stream()
-大部分模型都支持stream输出，提升用户体验，特别是响应时间较长的请求\
-调用 stream() 会返回一个迭代器，它会在输出生成时逐块返回，可以使用循环实时处理每个块
+通过stream()方法可以实现流式逐块返回输出，无需等待全部生成，大幅提升长响应场景的用户体验\
+返回迭代器，可实时展示、拼接片段
+
 
 示例1：
 ```python
@@ -93,9 +103,8 @@ print(full.content_blocks)
 只在部分环节支持流式而其他环节仍然要求完整数据，就无法充分利用streaming的优势
 
 
-
 **Streaming Event**\
-通过astream_events()流式处理语义事件(semantic events)
+通过astream_events()方法可以流式处理语义事件(semantic events)
 
 示例：
 ```python
@@ -115,14 +124,10 @@ async for event in model.astream_events("Hello"):
 ```
 
 **Auto-Streaming**\
-在某些特定的场景下，即便没有显式的执行stream，但langchain也会自动进行streaming\
-当使用invoke()进行非流式处理，但仍然希望流式处理整个应用程序时，包括来自聊天模型的中间结果时，这尤其有用
-
-
+特定场景下，即使不显式调用stream()，LangChain也会自动开启流式处理，适合用invoke() 但仍想获取中间流式结果的场景
 
 ## batch()
-由于模型可以并行处理请求，可以将各请求批量发送给模型，会显著提高性能和降低成本\
-可以通过batch()方法实现这样的批量操作\
+通过batch()方法可以批量发送多条请求，利用模型并行处理能力，提升效率、降低成本\
 注：batch()方法跟provider提供的原生batch API是不同的
 
 
