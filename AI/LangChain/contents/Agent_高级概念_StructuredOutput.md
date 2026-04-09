@@ -1,17 +1,18 @@
-# 关于Structured output
-LangChain提供了一个策略，可以让model按照指定格式返回内容\
-通过response_format参数实现
+[目录](../目录.md)
 
-structure output有以下两种方式：
+
+# 关于Structured Output
+LangChain支持通过response_format参数，强制模型按指定格式返回结构化数据
+
+提供两种策略：
 - ToolStrategy
 - ProviderStrategy
 
 
 # ToolStrategy
-ToolStrategy是一种通过“模拟调用工具”的方式来让model生成结构化输出的方法\
-它把model的输出组织成调用某个预定义工具（或工具接口）的形式，从而得到可解析的、结构化的数据（比如 JSON 或特定字段的映射）\
-任何支持tool calling的model都可以使用ToolStrategy的方式\
-当model provider原生支持结构化输出不可用或不可靠时，就应该使用ToolStrategy
+通过模拟工具调用（tool call）实现结构化输出\
+模型并非真实调用工具，而是遵循工具调用协议输出规范格式\
+所有支持tool calling的模型均可使用，适合厂商原生结构化输出不可用或不稳定的场景
 
 示例：
 ```python
@@ -41,8 +42,11 @@ result["structured_response"]
 
 
 # ProviderStrategy
-ProviderStragety 使用model provider原生的结构化输出能力\
-它更可靠，但只有provider支持原生结构化输出时才可用
+直接使用模型厂商原生结构化输出能力，格式更标准、稳定性更高，但仅当提供商原生支持时可用
+
+**自动降级规则（LangChain 1.0+）**\
+response_format直接传入schema时，默认使用ProviderStrategy\
+若厂商不支持原生结构化输出，框架自动降级为ToolStrategy
 
 示例：
 ```python
@@ -53,6 +57,3 @@ agent = create_agent(
     response_format=ProviderStrategy(ContactInfo)
 )
 ```
-
-从langchain 1.0开始，如果 response_format直接设置为schema，则默认使用ProviderStrategy的方式\
-如果provider原生不支持，则会按照ToolStrategy的方式

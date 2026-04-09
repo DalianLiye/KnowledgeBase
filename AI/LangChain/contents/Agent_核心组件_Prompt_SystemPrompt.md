@@ -1,12 +1,13 @@
 [目录](../目录.md)
 
 
-# 关于System prompt
+# 关于System Prompt
 通过system prompt，可以塑造agent如何执行task\
-如果没有指定system prompt，那么agent就只通过user prompt来推理task
+如果没有指定system prompt，Agent仅通过user prompt推理任务
 
 
-通过create_agent的system_prompt参数指定prompt，值可以是字符串，或SystemMessage对象\
+通过 create_agent 的system_prompt参数指定提示词，值可以是字符串或SystemMessage对象
+
 示例：指定字符串
 ```python
 agent = create_agent(
@@ -17,9 +18,10 @@ agent = create_agent(
 ```
 
 示例：指定SystemMessage对象\
-指定SystemMessage对象，可以更细粒度的控制Prompt的结构\
-不同的provider，SystemMessage对象里的属性也会不同\
-比如，cache_control属性可以让Anthropic缓存content block，以此减少重复请求的延迟和成本
+使用SystemMessage对象可以更细粒度控制Prompt结构\
+不同模型提供商（provider）支持的属性不同\
+例如 Anthropic支持cache_control实现内容块缓存，减少重复请求的延迟与成本
+
 ```python
 from langchain.agents import create_agent
 from langchain.messages import SystemMessage, HumanMessage
@@ -46,13 +48,13 @@ result = literary_agent.invoke(
 )
 ```
 
-# Dynamic system prompt
-可以通过middleware，动态指定system prompt\
-middleware使用@dynamic_prompt 装饰器
 
-使用@dynamic_prompt 装饰器的middleware不需要return handler(request)\
-因为它不是“拦截-再放行”的 handler 风格 middleware，而是 LangChain 里一种“动态生成 prompt 的中间件/钩子”\
-即框架会在发起模型请求前调用它，把它的返回字符串当作（或注入为）system prompt 的一部分/全部
+# Dynamic System Prompt
+可以通过middleware，动态指定system prompt, 使用@dynamic_prompt装饰器实现
+
+@dynamic_prompt是专门用于动态生成system prompt的钩子，并非请求拦截式中间件，因此只需返回字符串作为提示词，无需调用handler\
+框架会在模型调用前自动执行该钩子，并将返回内容作为system prompt使用
+
 
 示例：
 ```python
