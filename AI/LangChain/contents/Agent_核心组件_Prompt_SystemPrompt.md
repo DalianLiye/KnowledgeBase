@@ -1,3 +1,6 @@
+[目录](../目录.md)
+
+
 # 关于System prompt
 通过system prompt，可以塑造agent如何执行task\
 如果没有指定system prompt，那么agent就只通过user prompt来推理task
