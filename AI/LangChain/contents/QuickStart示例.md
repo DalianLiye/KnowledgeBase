@@ -110,32 +110,33 @@ print(response['structured_response'])
 
 
 - **Tool**\
-  Tool就是自定义的函数，可以让LLM跟外部系统交互\
-  在System prompt要对Tool函数进行详细描述，包括函数名，参数，以及何时调用，这样LLM就可以更好的调用Tool函数了
+  Tool就是自定义的函数，可以让模型跟外部系统交互\
+  在System prompt要对Tool函数进行详细描述，包括函数名，参数，以及何时调用，这样模型就可以更好的调用Tool函数了
 
   在Tool函数加装饰器@Tool后, 函数就可以接收参数 "runtime: ToolRuntime[自定义类型]"\
   函数体内，通过ToolRuntime[自定义类型]类型参数，获取一些meta和上下文信息，用于函数体内的逻辑实现\
   该示例中，自定义了一个类型Context，那么参数就可以写成runtime: ToolRuntime[Context]，然后runtime.context的返回值就是自定义类型Context的一个实例
 
   Tool函数的参数既可以是自定义的，也可以是使用ToolRuntime[Context]，也可以混合使用(ToolRuntime类型参数必须是第一个位置)\
-  它们的区别在于，自定义参数的值，是LLM分析了user发给LLM的message后得到，然后传给函数的（经过LLM）\
-  ToolRuntime[自定义类型]类型参数无需经由LLM分析，是由 LangChain 运行时注入（没经过LLM）
+  它们的区别在于，自定义参数的值，是模型分析了用户发送的提示词后得到的，然后传给函数的（经过模型）\
+  ToolRuntime[自定义类型]类型参数无需经由LLM分析，是由LangChain运行时注入（没经过模型）
 
   函数体内，也可以跟agent Memory进行交互
 
 
 - **Model**\
-  通过Model设置LLM参数\
-  不同Provider的LLM，需要配置的参数可能各不相同\
-  示例中使用ChatOpenAI创建DeepSeek模型，LangChain会通过OpenAI协议适配器调用模型
+  通过Model设置模型参数\
+  不同厂商的模型的配置参数也各不相同\
+  示例使用ChatOpenAI创建DeepSeek模型，LangChain会通过OpenAI协议适配器调用模型\
+  DeepSeek官方直接兼容OpenAI的API格式，所以不用装额外插件，直接用ChatOpenAI就能调用
 
 
 - **Response Format**\
-  可以对LLM的返回值定义严格的format\
-  比如format可以是一个字典对象，包含一些自定义的字段，然后可以让LLM将输出按照这种事先定义好的format返回给agent
+  可以对模型的返回值定义严格的format\
+  比如format可以是一个字典对象，包含一些自定义的字段，然后让模型将输出按照这种事先定义好的format返回给agent
 
 
 - **Memory**\
-  可以在Model里为agent指定一个memory对象，用于可以记录和维护每次与LLM对话的状态信息\
-  InMemorySaver会在程序结束后清除，不是Agent结束\
+  可以在Model里为agent指定一个memory对象，用于记录和维护每次与模型对话的状态信息\
+  InMemorySaver会在程序结束后被清除，不是Agent执行结束\
   生产环境，建议设置为持久存储，比如DB

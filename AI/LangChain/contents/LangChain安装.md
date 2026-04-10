@@ -3,7 +3,7 @@
 
 # 安装要求
 LangChain安装需要注意以下几点：
-- Python版本：3.10及以上
+- LangChain 1.0+要求的Python版本：3.10及以上
 - LangChain的各类模型集成（Integration）需要单独安装，例如与 OpenAI、Anthropic等大模型交互时，需额外安装对应的集成包
 
 # 关于模型集成（Integration）
