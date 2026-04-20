@@ -31,7 +31,7 @@ response = model.invoke("Write a haiku about spring")
 
 
 ## 消息提示词
-也可以通过传入消息对象列表(message prompts)的方式，给模型发送多条消息
+也可以通过传入消息对象列表的方式(message prompts)，给模型发送多条消息
 
 它通过专门的消息对象（SystemMessage、HumanMessage、AIMessage）来构建对话上下文，而不是简单的字符串\
 这种方式能清晰区分不同角色的消息，让模型理解对话结构
