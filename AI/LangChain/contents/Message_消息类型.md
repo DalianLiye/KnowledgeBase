@@ -17,6 +17,7 @@
 系统消息(System Message)代表一组用于 “预调” 模型行为的初始指令
 可以用系统消息来设定对话语气、定义模型角色，并为回复建立行为准则
 
+示例：Basic instructions
 ```python
 system_msg = SystemMessage("You are a helpful coding assistant.")
 
@@ -27,6 +28,7 @@ messages = [
 response = model.invoke(messages)
 ```
 
+示例：Detailed persona
 ```python
 from langchain.messages import SystemMessage, HumanMessage
 
