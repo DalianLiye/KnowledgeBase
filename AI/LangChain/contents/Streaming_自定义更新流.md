@@ -1,0 +1,40 @@
+[目录](../目录.md)
+
+
+# 自定义更新流
+
+要在工具执行过程中流式输出自定义更新，可以使用 get_stream_writer
+
+```python
+from langchain.agents import create_agent
+from langgraph.config import get_stream_writer  
+
+
+def get_weather(city: str) -> str:
+    """Get weather for a given city."""
+    writer = get_stream_writer()
+    # stream any arbitrary data
+    writer(f"Looking up data for city: {city}")
+    writer(f"Acquired data for city: {city}")
+    return f"It's always sunny in {city}!"
+
+agent = create_agent(
+    model="claude-sonnet-4-6",
+    tools=[get_weather],
+)
+
+for chunk in agent.stream(
+    {"messages": [{"role": "user", "content": "What is the weather in SF?"}]},
+    stream_mode="custom",
+    version="v2",
+):
+    if chunk["type"] == "custom":
+        print(chunk["data"])
+```
+
+```text
+Looking up data for city: San Francisco
+Acquired data for city: San Francisco
+```
+
+如果在工具中使用了get_stream_writer，就无法在LangGraph执行上下文之外调用该工具

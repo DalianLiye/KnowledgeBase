@@ -6,7 +6,7 @@
 # Tools（工具）
 
 **在工具中读取短期记忆（Read short-term memory in a tool）**\
-在工具中，你可以通过 runtime 参数（类型为 ToolRuntime）访问短期记忆（state）
+在工具中，你可以通过 runtime 参数（类型为 ToolRuntime）访问短期记忆（state）\
 runtime 参数对工具签名是隐藏的（模型看不到它），但工具可以通过它访问 state
 
 ```python
