@@ -1,10 +1,10 @@
 [目录](../目录.md)
 
 
-
 # 关于工具调用策略
-对于不支持原生结构化输出的模型，LangChain 使用工具调用来实现相同的效果。这适用于所有支持工具调用的模型（大多数现代模型都支持）。
-要使用此策略，请配置 ToolStrategy：
+对于不支持原生结构化输出的大模型，LangChain可借助工具调用实现结构化数据返回，该方案兼容所有具备工具调用能力的模型
+使用该策略只需配置ToolStrategy，定义结构如下：
+
 ```python
 class ToolStrategy(Generic[SchemaT]):
     schema: type[SchemaT]
@@ -17,25 +17,31 @@ class ToolStrategy(Generic[SchemaT]):
         Callable[[Exception], str],
     ]
 ```
-schema (必填参数)
-用于定义结构化输出格式的 Schema，支持以下几种类型：
-- Pydantic 模型：继承自 BaseModel 的子类，自带字段校验，返回经过验证的 Pydantic 实例。
-- 数据类 (Dataclasses)：带类型注解的 Python 数据类，返回字典。
-- TypedDict：类型化字典类，返回字典。
-- JSON Schema：符合 JSON Schema 规范的字典，返回字典。
-- Union 类型：多个 Schema 选项，模型会根据上下文选择最合适的 Schema
 
-tool_message_content
-当生成结构化输出时，返回的工具消息的自定义内容。如果未提供，默认显示结构化响应数据。
+- **schema (必填参数)**
+  定义结构化输出的数据格式，支持多种声明方式：
+  - **Pydantic 模型**\
+    继承BaseModel，自带字段校验，返回校验完成的Pydantic实例
+  - **数据类 (Dataclasses)**\
+    Python类型注解数据类，最终返回字典
+  - **TypedDict**\
+    轻量化类型字典，最终返回字典
+  - **JSON Schema**\
+    标准JSON格式字典，通用性最强
+  - **Union类型**\
+    定义多种Schema结构，模型自动匹配适配格式
 
-handle_errors
-结构化输出验证失败时的错误处理策略。默认值为 True。
-- True：使用默认错误模板捕获所有错误
-- str：使用此自定义消息捕获所有错误
-- type[Exception]：仅使用默认消息捕获此异常类型
-- tuple[type[Exception], ...]：仅使用默认消息捕获这些异常类型
-- Callable[[Exception], str]：返回错误消息的自定义函数
-- False：不重试，让异常向上抛出
+- **tool_message_content**\
+  当生成结构化输出时，返回的工具消息的自定义内容。如果未提供，默认显示结构化响应数据。
+
+- **handle_errors**\
+  结构化格式校验失败时的错误处理与重试策略，默认值为 True
+  - True：启用默认错误模板，自动捕获异常并提示重试
+  - str：使用自定义提示语引导模型修正格式
+  - type[Exception]：仅捕获指定异常，其余异常直接抛出
+  - tuple[type[Exception], ...]：批量捕获多种指定异常
+  - Callable[[Exception], str]：接收异常对象，动态返回错误提示
+  - False：关闭自动重试，异常直接向上抛出
 
 Pydantic Model
 ```python
@@ -196,9 +202,9 @@ result["structured_response"]
 # ProductReview(rating=5, sentiment='positive', key_points=['fast shipping', 'expensive'])
 ```
 
-# 自定义工具消息内容
-tool_message_content 参数允许你自定义，当生成结构化输出时，出现在对话历史中的消息内容
 
+# 自定义工具消息内容
+通过tool_message_content自定义结构化解析完成后，会话中展示的提示文案，优化对话展示效果
 ```python
 from pydantic import BaseModel, Field
 from typing import Literal
@@ -226,6 +232,7 @@ agent.invoke({
 })
 ```
 
+自定义文案展示效果
 ```text
 ================================ Human Message =================================
 
@@ -244,7 +251,7 @@ Name: MeetingAction
 Action item captured and added to meeting notes!
 ```
 
-Without tool_message_content, our final ToolMessage would be:
+默认无自定义文案效果
 ```text
 ================================= Tool Message =================================
 Name: MeetingAction
@@ -253,12 +260,11 @@ Returning structured response: {'task': 'update the project timeline', 'assignee
 ```
 
 # 错误处理
-
-模型在通过工具调用生成结构化输出时，可能会出现错误
-LangChain 提供了智能重试机制，可以自动处理这些错误
+工具调用生成结构化数据时常出现格式错乱、多工具调用、字段越界等问题，LangChain内置自动重试纠错机制
 
 **多结构化输出错误**\
-当模型错误地调用了多个结构化输出工具时，智能体会通过 ToolMessage 提供错误反馈，并提示模型重试：
+当模型错误地调用了多个结构化输出工具时，agent会通过 ToolMessage 提供错误反馈，并提示模型重试：
+模型同时调用多个结构化工具，框架自动返回错误提示，引导模型仅返回单一结果?
 ```python
 from pydantic import BaseModel, Field
 from typing import Union
@@ -327,6 +333,7 @@ Returning structured response: {'name': 'John Doe', 'email': 'john@email.com'}
 
 **Schema 校验错误**\
 当结构化输出与预期的 Schema 不匹配时，智能体会提供具体的错误反馈：
+输出字段超出约束范围，框架精准抛出校验错误，引导模型修正数值与格式
 ```python
 from pydantic import BaseModel, Field
 from langchain.agents import create_agent
@@ -417,9 +424,6 @@ Returning structured response: {'rating': 5, 'comment': 'Amazing product'}
   )
   ```
   如果 handle_errors 是一个异常元组，那么智能体仅在抛出的异常是指定类型之一时，才会使用默认错误消息进行重试。其他所有情况，异常都会直接抛出
-
-
-
 
 
 - Custom error handler function:

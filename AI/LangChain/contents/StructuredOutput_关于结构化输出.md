@@ -2,11 +2,13 @@
 
 
 # 关于结构化输出
-结构化输出允许 agent 以特定、可预测的格式返回数据。你无需再解析自然语言响应，而是可以直接获取 JSON 对象、Pydantic 模型或数据类形式的结构化数据，供应用程序直接使用。
+结构化输出可让agent按固定规范格式返回数据，无需解析自然语言\
+可直接获取JSON、Pydantic模型等结构化数据，方便应用直接使用
 
-提示：本页介绍了使用 create_agent 的 agent 结构化输出。如需直接在模型上使用结构化输出（不使用 agent），请参阅「Models - Structured output」部分
+LangChain的create_agent原生支持结构化输出：\
+只需定义输出Schema，模型生成的结构化数据会被自动捕获、验证，并以structured_response存入agent状态
 
-LangChain 的 create_agent 会自动处理结构化输出。用户设置期望的结构化输出 schema 后，当模型生成结构化数据时，它会被捕获、验证，并以 structured_response 键的形式返回到 agent 的状态中
+部分模型支持原生结构化输出，下文示例基于create_agent实现框架层结构化输出，不依赖模型原生能力
 
 ```python
 def create_agent(
