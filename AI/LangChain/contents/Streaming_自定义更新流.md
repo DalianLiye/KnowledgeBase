@@ -2,8 +2,7 @@
 
 
 # 自定义更新流
-
-要在工具执行过程中流式输出自定义更新，可以使用 get_stream_writer
+要在工具执行过程中流式输出自定义更新，可以使用get_stream_writer
 
 ```python
 from langchain.agents import create_agent

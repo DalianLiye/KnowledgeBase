@@ -4,7 +4,7 @@
 # V2流式输出格式
 
 要求：LangGraph >= 1.1
-在调用 stream() 或 astream() 时传入 version="v2"，即可获得统一的输出格式。无论使用哪种流模式或组合多少种模式，每个数据块都是一个包含 type、ns 和 data 键的 StreamPart 字典
+在调用stream() 或 astream() 时传入 version="v2"，即可获得统一的输出格式。无论使用哪种流模式或组合多少种模式，每个数据块都是一个包含 type、ns 和 data 键的 StreamPart 字典
 
 示例:v2 (new)
 ```python
@@ -40,4 +40,4 @@ print(result.value)       # state (dict, Pydantic model, or dataclass)
 print(result.interrupts)  # tuple of Interrupt objects (empty if none)
 ```
 
-有关 V2 格式的更多细节，包括类型收窄、Pydantic / 数据类的强制转换以及子图流式处理，请参阅 LangGraph 流式文档
+有关V2格式的更多细节，包括类型收窄、Pydantic/数据类的强制转换以及子图流式处理，请参阅 LangGraph 流式文档

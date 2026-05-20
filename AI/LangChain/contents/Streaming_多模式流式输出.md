@@ -5,7 +5,7 @@
 可以通过传入一个列表来指定多种流式模式，例如：stream_mode=["updates", "custom"]
 
 每个流式数据块都是一个StreamPart字典，包含 type、ns 和 data 字段
-使用 chunk["type"] 来判断流模式，用 chunk["data"] 来访问具体的内容数据
+使用chunk["type"] 来判断流模式，用 chunk["data"] 来访问具体的内容数据
 
 ```python
 from langchain.agents import create_agent

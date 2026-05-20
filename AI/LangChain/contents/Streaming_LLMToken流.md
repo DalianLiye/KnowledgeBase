@@ -3,7 +3,7 @@
 
 # 关于LLMToken流
 要在LLM生成token时进行流式输出，使用stream_mode="messages"
-下方是 agent 流式输出工具调用和最终回复的示例
+下方是agent流式输出工具调用和最终回复的示例
 
 ```python
 from langchain.agents import create_agent

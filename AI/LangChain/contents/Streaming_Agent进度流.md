@@ -2,13 +2,13 @@
 
 
 # 关于Agent进度流
-要流式输出agent的执行进度，使用stream或astream方法，并指定stream_mode="updates"
-它会在agent的每一步执行完成后，发出一个事件
+如需流式获取Agent执行进度，调用stream或astream方法，并指定流式模式为stream_mode="updates"即可
+该模式会在Agent每一个执行步骤结束后，主动推送状态事件
 
-例如，一个调用一次工具的agent，会按顺序产生以下更新：
-- LLM 节点：生成包含工具调用请求的 AIMessage
-- 工具节点：执行工具并返回 ToolMessage
-- LLM 节点：生成最终的 AI 响应
+以单次工具调用的Agent为例，事件推送顺序如下：
+- LLM节点：生成包含工具调用请求的 AIMessage
+- 工具节点：执行对应工具，返回工具执行结果消息
+- LLM节点：整合结果，生成最终AI回答
 
 
 ```python

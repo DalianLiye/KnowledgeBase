@@ -3,12 +3,12 @@
 
 # Streaming thinking /reasoning tokens
 
-部分模型在生成最终答案前会进行内部推理
-你可以通过筛选 type 为 "reasoning" 的标准内容块，来流式输出这些思考 / 推理 Token
+部分模型在生成最终答案前会进行内部推理\
+可以通过筛选type为"reasoning"的标准内容块，来流式输出这些思考/推理Token
 
-重要提示：推理输出必须在模型端开启
+注：推理输出必须在模型端开启
 
-要从 agent 中流式输出思考 Token，使用 stream_mode="messages" 并筛选推理内容块
+要从agent中流式输出思考Token，使用stream_mode="messages"并筛选推理内容块
 
 ```python
 from langchain.agents import create_agent
@@ -53,19 +53,20 @@ for token, metadata in agent.stream(
 [thinking]  with "San Francisco" as the city parameter.
 The weather in San Francisco is: It's always sunny in San Francisco!
 ```
-无论使用哪个模型服务商，其工作方式都是一致的：LangChain 会通过 content_blocks 属性，将不同服务商的特定格式（如 Anthropic 的 thinking 块、OpenAI 的 reasoning summaries 等）标准化为统一的 "reasoning" 内容块类型
+无论使用哪个模型服务商，其工作方式都是一致的, 即：\
+LangChain会通过content_blocks属性，将不同服务商的特定格式（如 Anthropic的thinking 块、OpenAI的reasoning summaries等）标准化为统一的 "reasoning"内容块类型
 
 
 # 流式输出工具调用（Streaming tool calls）
-你可能希望同时流式输出以下两种信息：
-- 工具调用生成过程中的部分 JSON（Partial JSON）
+可能希望同时流式输出以下两种信息：
+- 工具调用生成过程中的部分JSON（Partial JSON）
 - 执行完成、已解析的工具调用结果
-设置 stream_mode="messages" 会流式输出 agent 中所有 LLM 调用生成的增量消息块
-要获取包含已解析工具调用的完整消息：
-- 如果这些消息被记录在 state 中（如 create_agent 的模型节点），使用 stream_mode=["messages", "updates"]，通过状态更新来访问完整消息（下方会演示）。
-- 如果这些消息未被记录在 state 中，使用自定义更新，或在流式循环中手动聚合块内容（下一节介绍）。
+  设置 stream_mode="messages"会流式输出agent中所有LLM调用生成的增量消息块
+  要获取包含已解析工具调用的完整消息：
+- 如果这些消息被记录在state中（如create_agent的模型节点），使用stream_mode=["messages", "updates"]，通过状态更新来访问完整消息（下方会演示）。
+- 如果这些消息未被记录在state中，使用自定义更新，或在流式循环中手动聚合块内容（下一节介绍）。
 
-提示：如果你的 agent 包含多个 LLM，请参阅下方关于子代理流式输出的章节
+提示：如果agent包含多个LLM，请参阅下方关于子代理流式输出的章节
 
 ```python
 from typing import Any
@@ -129,9 +130,9 @@ The| weather| in| Boston| is| **|sun|ny|**|.|
 **Accessing completed messages（访问已完成消息）**\
  重要提示：如果已完成消息被记录在 agent 的 state 中，你可以使用 stream_mode=["messages", "updates"]（如流式工具调用部分所示），从而在流式过程中访问已完成消息。
 
-在某些情况下，已完成的消息不会体现在 state 更新中。如果你能访问 agent 内部逻辑，可以使用 自定义更新（custom updates） 来在流式过程中访问这些消息；否则，你可以在流式循环中聚合消息块（见下文）。
+ 在某些情况下，已完成的消息不会体现在 state 更新中。如果你能访问 agent 内部逻辑，可以使用 自定义更新（custom updates） 来在流式过程中访问这些消息；否则，你可以在流式循环中聚合消息块（见下文）。
 
-思考以下示例：我们在一个简化的 guardrail middleware（防护中间件） 中集成了流写入器（stream writer）。该中间件通过工具调用来生成结构化的 “安全 / 不安全（safe/unsafe）” 评估结果（你也可以使用结构化输出（structured outputs）来实现这一点）
+ 思考以下示例：我们在一个简化的 guardrail middleware（防护中间件） 中集成了流写入器（stream writer）。该中间件通过工具调用来生成结构化的 “安全 / 不安全（safe/unsafe）” 评估结果（你也可以使用结构化输出（structured outputs）来实现这一点）
 ```python
 from typing import Any, Literal
 
@@ -388,8 +389,9 @@ Tool: get_weather
 Args: {'city': 'San Francisco'}
 ```
 
-接下来，我们为每个中断收集一个决策。重要的是，决策的顺序必须与我们收集到的动作顺序相匹配。
-为了说明，我们将编辑一个工具调用，并接受另一个：
+接下来，为每个中断收集一个决策
+重要的是，决策的顺序必须与我们收集到的动作顺序相匹配
+将编辑一个工具调用，并接受另一个：
 
 ```python
 def _get_interrupt_decisions(interrupt: Interrupt) -> list[dict]:
@@ -464,22 +466,20 @@ Tool response: [{'type': 'text', 'text': "It's always sunny in San Francisco!"}]
 
 
 # 子代理流式输出（Streaming from sub-agents）
-当 agent 中的任意环节存在多个 LLM 时，通常需要区分生成消息的来源
+当agent中的任意环节存在多个LLM时，通常需要区分生成消息的来源
 
-为此，创建每个 agent 时传入 name 参数。在 messages 模式下流式输出时，可通过元数据中的 lc_agent_name 键获取该名称
+为此，创建每个agent时传入name参数。在 messages 模式下流式输出时，可通过元数据中的 lc_agent_name 键获取该名称
 
 下面，我们更新「流式工具调用」示例：
-- 将工具替换为内部调用 agent 的 call_weather_agent 工具
-- 为每个 agent 添加 name
-- 创建流时指定 subgraphs=True
-- 流处理逻辑与之前相同，但新增了利用 create_agent 的 name 参数追踪当前活跃 agent 的逻辑
+- 将工具替换为内部调用agent的call_weather_agent 工具
+- 为每个agent添加 name
+- 创建流时指定subgraphs=True
+- 流处理逻辑与之前相同，但新增了利用create_agent的name参数追踪当前活跃agent的逻辑
 
-提示：为 agent 设置 name 后，该名称也会附加到该 agent 生成的所有 AIMessage 上。
+注：为agent设置name后，该名称也会附加到该agent生成的所有AIMessage 上
+
+
 接下来，我们先构建 agent：
-
-
-
-First we construct the agent:
 ```python
 from typing import Any
 
