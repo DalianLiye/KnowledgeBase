@@ -43,6 +43,8 @@ class ToolStrategy(Generic[SchemaT]):
   - Callable[[Exception], str]：接收异常对象，动态返回错误提示
   - False：关闭自动重试，异常直接向上抛出
 
+
+# 示例
 Pydantic Model
 ```python
 from pydantic import BaseModel, Field

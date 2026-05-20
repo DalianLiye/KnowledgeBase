@@ -2,10 +2,10 @@
 
 
 # 自定义agent记忆
+默认情况下，Agent使用AgentState管理短期记忆，通过messages字段维护完整对话历史\
+可以继承AgentState，自由添加自定义字段，扩展记忆能力\
+扩展后的自定义状态Schema，通过state_schema参数传入create_agent即可生效
 
-默认情况下，agent使用AgentState来管理短期记忆，具体来说，是通过messages字段来维护对话历史
-可以继承AgentState来添加额外字段
-自定义状态schema通过state_schema参数传递给create_agent
 
 ```python
 from langchain.agents import create_agent, AgentState

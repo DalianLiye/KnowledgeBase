@@ -2,12 +2,16 @@
 
 
 # 使用短期记忆
-要为agent添加短期记忆（线程级持久化），需要在创建agent时指定一个checkpointer
 
-LangChain的agent将短期记忆作为其状态的一部分进行管理\
-Agent通过将这些信息存储在图状态中，既可以访问特定对话的完整上下文，又能保持不同线程之间的隔离\
-状态会通过检查点器持久化到数据库（或内存）中，因此线程可以随时恢复\
-短期记忆会在Agent被调用或一个步骤（如工具调用）完成时更新，并且状态会在每个步骤开始时被读取。
+为Agent添加短期记忆（线程级对话记忆），只需在创建Agent时指定一个checkpointer\
+LangChain Agent会将短期记忆作为状态（state）的一部分自动管理：
+- Agent 通过图状态存储对话上下文
+- 不同线程（thread）之间的记忆完全隔离
+- 状态会通过 checkpointer 自动持久化到内存或数据库
+- 线程可随时暂停、恢复、继续对话
+- 短期记忆会在 Agent 调用或步骤（如工具调用）完成时自动更新
+- 每个步骤开始时会自动读取最新状态
+
 
 ```python
 from langchain.agents import create_agent
@@ -27,8 +31,7 @@ agent.invoke(
 ```
 
 **生产环境用法**\
-在生产环境中，应使用由数据库支持的checkpointer
-
+生产环境推荐使用数据库持久化的checkpointer，确保记忆不会丢失
 ```shell
 pip install langgraph-checkpoint-postgres
 ```

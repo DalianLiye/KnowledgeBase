@@ -3,22 +3,23 @@
 # 常见模式
 启用短期记忆后，长对话可能会超出 LLM 的上下文窗口。常见的解决方案有：
 - **Trim messages（裁剪消息）**\
-  在调用 LLM 前，移除前 N 条或后 N 条消息
+  在调用LLM前，移除前N条或后N条消息
 - **Delete messages（删除消息）**\
-  从LangGraph 状态中永久删除消息
+  从LangGraph状态中永久删除消息
 - **Summarize messages（总结消息）**\
   对历史中较早的消息进行总结，并将其替换为一段摘要
 - **Custom strategies（自定义策略）**\
   自定义策略（例如消息过滤等）
 
-这些方法可以让 agent 跟踪对话，同时又不会超出 LLM 的上下文窗口限制
+这些方法可以让agent跟踪对话，同时又不会超出 LLM 的上下文窗口限制
+
 
 ## Trim messages（裁剪消息）
-大多数模型都有最大支持上下文窗口（以 token 为单位）
+大多数模型都有最大支持的上下文窗口（以 token 为单位）\
+一种常用的截断方式是：计算对话历史的总 token 数，当接近模型上限时自动裁剪\
+在 LangChain 中，可以直接使用内置的消息裁剪工具，指定需要保留的最大 token 数量，并设置裁剪策略（例如只保留最新的 max_tokens 内容）\
+如果要在Agent中实现自动裁剪历史消息，可通过@before_model中间件装饰器，在模型调用前统一处理上下文
 
-决定何时截断消息的一种方法是：计算消息历史中的token数量，当它接近限制时进行截断\
-如果使用LangChain，可以使用trim messages工具，指定从列表中保留的token数量，以及处理边界的策略（例如，保留最后的 max_tokens）\
-要在agent中裁剪消息历史，可以使用@before_model中间件装饰器
 
 ```python
 from langchain.messages import RemoveMessage
@@ -74,11 +75,12 @@ If you'd like me to call you a nickname or use a different name, just say the wo
 ```
 
 ## Delete messages（删除消息）
-可以从graph state中删除消息，来管理对话历史
-当想移除特定消息，或者清空整个对话历史时，这个方法很有用
-要从graph state中删除消息，可以使用 RemoveMessage
-要让RemoveMessage生效，状态字段必须使用带有add_messages reducer的键
-默认的AgentState已经提供了这个reducer
+可以直接从 graph state 中删除消息，以此管理对话历史\
+当需要移除特定消息，或清空整段对话历史时，这种方法非常实用\
+删除消息需要使用RemoveMessage工具\
+要让RemoveMessage正常生效，状态字段必须使用add_messages reducer\
+默认的AgentState已内置该reducer，可直接使用
+
 
 示例：要删除特定消息
 ```python
@@ -102,11 +104,9 @@ def delete_messages(state):
 
 
 **删除消息的注意事项**\
-删除消息时，请确保处理后的消息历史是有效的\
-请检查所使用的大模型服务商的限制，例如：
-- 部分服务商要求消息历史必须以user消息开头
-- 大多数服务商要求包含工具调用的assistant消息，后面必须跟着对应的tool结果消息
-
+执行消息删除操作后，务必保证剩余对话历史格式合法有效, 同时需遵循对应大模型服务商的调用规范, 常见约束如下：
+- 部分平台要求对话历史必须以用户消息作为起始内容
+- 绝大多数平台规定，携带工具调用内容的模型回复消息，后方必须搭配对应的工具结果消息
 
 
 ```python
@@ -162,10 +162,10 @@ for event in agent.stream(
 ```
 
 ## Summarize messages（消息总结）
-正如前文所述，裁剪或删除消息的问题在于：你可能会因为剔除消息队列而丢失关键信息\
-因此，一些应用会采用更成熟的方案：使用聊天模型（LLM）对消息历史进行总结
+前文提到，单纯裁剪、删除历史消息容易直接丢弃重要对话信息，造成内容缺失\
+为此业界常用更稳妥的优化方案：调用大语言模型对早期对话历史进行精简汇总
 
-要在agent中实现对话历史的自动总结，可以使用内置的总结功能
+如需在Agent内实现对话历史自动总结，可直接使用框架内置的消息总结能力
 
 ![Summarize messages](./img/ShortTermMemory_常见模式_001.png)
 

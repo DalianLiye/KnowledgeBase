@@ -1,13 +1,13 @@
 [目录](../目录.md)
 
 
-可以通过多种方式访问和修改 agent 的短期记忆（即 state）
+可以通过多种方式访问和修改agent的短期记忆（即 state）
 
 # Tools（工具）
 
 **在工具中读取短期记忆（Read short-term memory in a tool）**\
-在工具中，你可以通过 runtime 参数（类型为 ToolRuntime）访问短期记忆（state）\
-runtime 参数对工具签名是隐藏的（模型看不到它），但工具可以通过它访问 state
+在工具中，可以通过runtime参数（类型为 ToolRuntime）访问短期记忆（state）\
+runtime参数对工具签名是隐藏的（模型看不到它），但工具可以通过它访问state
 
 ```python
 from langchain.agents import create_agent, AgentState
@@ -42,8 +42,8 @@ print(result["messages"][-1].content)
 
 
 **从工具写入短期记忆（Write short-term memory from tools）**\
-在执行过程中，若要修改 agent 的短期记忆（即 state），可以直接从工具返回状态更新\
-这种方式适用于持久化中间结果，或让后续工具 / 提示词能够访问这些信息
+在执行过程中，若要修改agent的短期记忆（即 state），可以直接从工具返回状态更新\
+这种方式适用于持久化中间结果，或让后续工具/提示词能够访问这些信息
 
 ```python
 from langchain.tools import tool, ToolRuntime
@@ -168,7 +168,7 @@ Hi John Smith, the weather in San Francisco is always sunny!
 
 
 # Before model（模型调用前）
-你可以在 @before_model 中间件中访问 agent 的短期记忆（state），在模型调用前处理消息
+可以在 @before_model 中间件中访问 agent 的短期记忆（state），在模型调用前处理消息
 ![Before model](./img/ShortTermMemory_访问memory_001.png)
 
 ```python
@@ -228,7 +228,7 @@ If you'd like me to call you a nickname or use a different name, just say the wo
 
 
 # After model（模型调用后）
-可以在 @after_model 中间件中访问 agent 的短期记忆（state），在模型调用后处理消息。
+可以在@after_model中间件中访问agent的短期记忆（state），在模型调用后处理消息
 ![After model](./img/ShortTermMemory_访问memory_002.png)
 
 ```python
