@@ -1,7 +1,7 @@
 [目录](../目录.md)
 
 
-# 关于动态工具
+# 关于动态选择工具
 Agent运行时，可以动态选择执行合适的工具
 
 实现方式：
@@ -20,137 +20,137 @@ Agent运行时，可以动态选择执行合适的工具
 
 ## 示例
 - 示例1：根据请求状态动态选择工具
-```python
-from langchain.agents import create_agent
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
-from typing import Callable
+  ```python
+  from langchain.agents import create_agent
+  from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+  from typing import Callable
 
-@wrap_model_call
-def state_based_tools(
-    request: ModelRequest,
-    handler: Callable[[ModelRequest], ModelResponse]
-) -> ModelResponse:
-    """Filter tools based on conversation State."""
-    # Read from State: check if user has authenticated
-    state = request.state
-    is_authenticated = state.get("authenticated", False)
-    message_count = len(state["messages"])
+  @wrap_model_call
+  def state_based_tools(
+      request: ModelRequest,
+      handler: Callable[[ModelRequest], ModelResponse]
+  ) -> ModelResponse:
+      """Filter tools based on conversation State."""
+      # Read from State: check if user has authenticated
+      state = request.state
+      is_authenticated = state.get("authenticated", False)
+      message_count = len(state["messages"])
 
-    # Only enable sensitive tools after authentication
-    if not is_authenticated:
-        tools = [t for t in request.tools if t.name.startswith("public_")]
-        request = request.override(tools=tools)
-    elif message_count < 5:
-        # Limit tools early in conversation
-        tools = [t for t in request.tools if t.name != "advanced_search"]
-        request = request.override(tools=tools)
+      # Only enable sensitive tools after authentication
+      if not is_authenticated:
+          tools = [t for t in request.tools if t.name.startswith("public_")]
+          request = request.override(tools=tools)
+      elif message_count < 5:
+          # Limit tools early in conversation
+          tools = [t for t in request.tools if t.name != "advanced_search"]
+          request = request.override(tools=tools)
 
-    return handler(request)
+      return handler(request)
 
-agent = create_agent(
-    model="gpt-4.1",
-    tools=[public_search, private_search, advanced_search],
-    middleware=[state_based_tools]
-)
+  agent = create_agent(
+      model="gpt-4.1",
+      tools=[public_search, private_search, advanced_search],
+      middleware=[state_based_tools]
+  )
 
-# 假设有 chat_history 和 user_is_authenticated
-response = agent.invoke(
-    input="帮我查一下内部数据",
-    state={
-        "messages": chat_history,
-        "authenticated": user_is_authenticated,
-    },
-)
-```
-说明:agent调用invoke函数时，传递的state参数里，messages和authenticated字段完全是自定义的，这里定义了什么字段，state_based_tools函数l里request.state就能获取什么字段
+  # 假设有 chat_history 和 user_is_authenticated
+  response = agent.invoke(
+      input="帮我查一下内部数据",
+      state={
+          "messages": chat_history,
+          "authenticated": user_is_authenticated,
+      },
+  )
+  ```
+  说明:agent调用invoke函数时，传递的state参数里，messages和authenticated字段完全是自定义的，这里定义了什么字段，state_based_tools函数l里request.state就能获取什么字段
 
 
 - 示例2：根据存储信息，动态选择工具
-```python
-from dataclasses import dataclass
-from langchain.agents import create_agent
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
-from typing import Callable
-from langgraph.store.memory import InMemoryStore
+  ```python
+  from dataclasses import dataclass
+  from langchain.agents import create_agent
+  from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+  from typing import Callable
+  from langgraph.store.memory import InMemoryStore
 
-@dataclass
-class Context:
-    user_id: str
+  @dataclass
+  class Context:
+      user_id: str
 
-@wrap_model_call
-def store_based_tools(
-    request: ModelRequest,
-    handler: Callable[[ModelRequest], ModelResponse]
-) -> ModelResponse:
-    """Filter tools based on Store preferences."""
-    user_id = request.runtime.context.user_id
+  @wrap_model_call
+  def store_based_tools(
+      request: ModelRequest,
+      handler: Callable[[ModelRequest], ModelResponse]
+  ) -> ModelResponse:
+      """Filter tools based on Store preferences."""
+      user_id = request.runtime.context.user_id
 
-    # Read from Store: get user's enabled features
-    store = request.runtime.store
-    feature_flags = store.get(("features",), user_id)
+      # Read from Store: get user's enabled features
+      store = request.runtime.store
+      feature_flags = store.get(("features",), user_id)
 
-    if feature_flags:
-        enabled_features = feature_flags.value.get("enabled_tools", [])
-        # Only include tools that are enabled for this user
-        tools = [t for t in request.tools if t.name in enabled_features]
-        request = request.override(tools=tools)
+      if feature_flags:
+          enabled_features = feature_flags.value.get("enabled_tools", [])
+          # Only include tools that are enabled for this user
+          tools = [t for t in request.tools if t.name in enabled_features]
+          request = request.override(tools=tools)
 
-    return handler(request)
+      return handler(request)
 
-agent = create_agent(
-    model="gpt-4.1",
-    tools=[search_tool, analysis_tool, export_tool],
-    middleware=[store_based_tools],
-    context_schema=Context,
-    store=InMemoryStore()
-)
-```
+  agent = create_agent(
+      model="gpt-4.1",
+      tools=[search_tool, analysis_tool, export_tool],
+      middleware=[store_based_tools],
+      context_schema=Context,
+      store=InMemoryStore()
+  )
+  ```
 
 - 示例3：根据运行时上下文，动态选择工具
-```python
-from dataclasses import dataclass
-from langchain.agents import create_agent
-from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
-from typing import Callable
+  ```python
+  from dataclasses import dataclass
+  from langchain.agents import create_agent
+  from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
+  from typing import Callable
 
-@dataclass
-class Context:
-    user_role: str
+  @dataclass
+  class Context:
+      user_role: str
 
-@wrap_model_call
-def context_based_tools(
-    request: ModelRequest,
-    handler: Callable[[ModelRequest], ModelResponse]
-) -> ModelResponse:
-    """Filter tools based on Runtime Context permissions."""
-    # Read from Runtime Context: get user role
-    if request.runtime is None or request.runtime.context is None:
-        # If no context provided, default to viewer (most restrictive)
-        user_role = "viewer"
-    else:
-        user_role = request.runtime.context.user_role
+  @wrap_model_call
+  def context_based_tools(
+      request: ModelRequest,
+      handler: Callable[[ModelRequest], ModelResponse]
+  ) -> ModelResponse:
+      """Filter tools based on Runtime Context permissions."""
+      # Read from Runtime Context: get user role
+      if request.runtime is None or request.runtime.context is None:
+          # If no context provided, default to viewer (most restrictive)
+          user_role = "viewer"
+      else:
+          user_role = request.runtime.context.user_role
 
-    if user_role == "admin":
-        # Admins get all tools
-        pass
-    elif user_role == "editor":
-        # Editors can't delete
-        tools = [t for t in request.tools if t.name != "delete_data"]
-        request = request.override(tools=tools)
-    else:
-        # Viewers get read-only tools
-        tools = [t for t in request.tools if t.name.startswith("read_")]
-        request = request.override(tools=tools)
+      if user_role == "admin":
+          # Admins get all tools
+          pass
+      elif user_role == "editor":
+          # Editors can't delete
+          tools = [t for t in request.tools if t.name != "delete_data"]
+          request = request.override(tools=tools)
+      else:
+          # Viewers get read-only tools
+          tools = [t for t in request.tools if t.name.startswith("read_")]
+          request = request.override(tools=tools)
 
-    return handler(request)
+      return handler(request)
 
-agent = create_agent(
-    model="gpt-4.1",
-    tools=[read_data, write_data, delete_data],
-    middleware=[context_based_tools],
-    context_schema=Context
-)
-```
+  agent = create_agent(
+      model="gpt-4.1",
+      tools=[read_data, write_data, delete_data],
+      middleware=[context_based_tools],
+      context_schema=Context
+  )
+  ```
 
 
 # 运行时动态注册新工具
