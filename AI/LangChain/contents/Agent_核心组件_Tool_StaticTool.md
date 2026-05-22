@@ -29,10 +29,7 @@
   agent = create_agent("openai:gpt-5", tools=[search, get_weather])
   ```
 
-- 示例2：添加工具元数据
-  当用@Tool装饰一个函数时，Agent会做以下操作：
-  - 将该函数标记为“工具”
-  - 装饰器里可以顺带配置该工具的名字、描述、参数结构等信息，方便模型更好地理解、选择、和调用这个工具
+- 示例2：添加工具元数据\
     
   ```python
   from typing import TypedDict
@@ -49,6 +46,10 @@
   ```
 
   说明:
+  - 当用@Tool装饰一个函数时，Agent会做以下操作：
+    - 将该函数标记为“工具”
+    - 装饰器里可以顺带配置该工具的名字、描述、参数结构等信息，方便模型更好地理解、选择、和调用这个工具
+  
   - @tool装饰器以下字段是预置的
     - **name**\
       虽然函数名叫weather_tool，但其实暴露给模型的工具名是"weather_lookup"\
