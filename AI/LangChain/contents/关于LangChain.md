@@ -38,7 +38,8 @@ LangChain有以下核心优势：
   基于LangChain的增强型Agent实现\
   内置长对话压缩、虚拟文件系统、子Agent等高级特性
 
-注：LangChain Core，LangChain和LangGraph的依赖关系如下： 
+**注：**\
+LangChain Core，LangChain和LangGraph的依赖关系如下： 
 - LangGraph → 依赖 → LangChain Core
 - LangChain → 依赖 → LangChain Core + LangGraph
 
