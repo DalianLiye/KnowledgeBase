@@ -1,15 +1,15 @@
 [目录](../目录.md)
 
 
-# 关于Static Tool
-Static tool指Agent创建时指定工具列表，生命周期内固定不变，是最常用的工具配置方式\
-传入工具列表为空时，Agent仅绑定LLM，不具备工具调用能力\
-Tool支持普通Python函数与协程（coroutines）
+# 关于静态工具
+创建Agent时指定全部工具列表，工具列表在整个生命周期内不变\
+静态工具是最常用的工具配置方式\
+当不指定工具列表或工具列表设置为空(Tools=[])时，意味着Agent仅绑定了模型，不具备工具调用能力
+
 
 # 示例
 
-示例1：绑定工具
-示例1：
+- 示例1：绑定工具
 ```python
 from langchain.tools import tool
 from langchain.agents import create_agent
@@ -29,8 +29,11 @@ def get_weather(location: str) -> str:
 agent = create_agent("openai:gpt-5", tools=[search, get_weather])
 ```
 
-示例2：添加工具元数据
-当用@Tool装饰一个函数时，不只是简单地把它标记为“工具”，还可以在装饰器里顺带配置这个工具的名字、描述、参数结构等信息，方便model更好地理解、选择、和调用这个工具
+- 示例2：添加工具元数据
+当用@Tool装饰一个函数时，Agent会做以下操作：
+- 将该函数标记为“工具”
+- 装饰器里可以顺带配置该工具的名字、描述、参数结构等信息，方便模型更好地理解、选择、和调用这个工具
+  
 ```python
 from typing import TypedDict
 from langchain.tools import tool
@@ -45,20 +48,19 @@ def weather_tool(city: str, unit: str = "celsius") -> str:
     return f"{city} 当前天气：26°C，单位为 {unit}"
 ```
 
-@tool装饰器这些属性字段是装饰器里预置的
-- **name**\
-  函数名叫get_weather，但对model暴露的工具名是"weather_lookup"\
-  即模型在“tool calls”协议里，会看到weather_lookup这个名字，而不是 get_weather
+说明:
+- @tool装饰器以下字段是预置的
+  - **name**\
+    虽然函数名叫weather_tool，但其实暴露给模型的工具名是"weather_lookup"\
+    即模型在“tool calls”协议里，会看到weather_lookup这个名字，而不是weather_tool
 
-- **description**\
-  提供了一句中文描述：查询指定城市的当前天气信息\
-  model会根据描述，决定何时调用这个工具（这对工具路由很重要）
+  - **description**\
+    提供了一句中文描述：查询指定城市的当前天气信息\
+    模型会根据描述，决定何时调用这个工具（这对工具路由很重要）
 
-- **args_schema**\
-  参数 schema 按定义的\
-  args_schema 用于定义工具的输入参数结构，支持Pydantic model或TypedDict\
-  脚本里是TypedDict，可以精确控制传入参数的字段名、类型等
+  - **args_schema**\
+    args_schema用于定义工具的输入参数结构，支持Pydantic model或TypedDict\
+    示例里是TypedDict，可以精确控制传入参数的字段名、类型等
 
-注：\
-这些属性信息也可以加载system prompt里，但写在装饰器里会有强约束力，更加稳定，因为它是langchain框架支持的\
-而写在system prompt里，其实是用来model的分析理解能力，约束力不强，不会特别稳定
+- 这些属性信息也可以定义在提示词里，但定义在装饰器里约束力更强，更稳定，因为它是langchain框架支持的\
+  写在提示词里，靠的是模型的分析理解能力，约束力不强也，不会特别稳定
