@@ -156,7 +156,7 @@ agent = create_agent(
 # 运行时动态注册新工具
 Agent运行过程中动态注册、加载、执行工具
 
-通过钩子函数实现：
+通过以下钩子函数实现：
 - **wrap_model_call**\
   将动态工具加入请求，即将动态工具注册到请求里\
   wrap_model_call触发时机：Agent让大模型思考之前，即:Agent收到用户问题 → 先跑wrap_model_call → 再把请求发给大模型
