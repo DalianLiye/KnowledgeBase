@@ -1,23 +1,25 @@
 [目录](../目录.md)
 
 
-# 关于Dynamic Tool
-Dynamic tool是指Agent可以在运行时，动态选择并执行合适的工具
+# 关于动态工具
+在Agent运行时，动态选择执行合适的工具
 
-Dynamic Tool有两种实现方式：
-- Filtering pre-registered tools（预先注册所有工具，运行时动态筛选）
-- Runtime tool registration（运行时动态注册新工具）
+两种实现方式：
+- 动态筛选预注册工具（预先注册所有工具，运行时动态筛选）
+- 运行时动态注册新工具
 
 
-## Filter Pre-Registered Tools
-Agent创建时预先注册全部工具，运行时根据状态、权限、配置动态筛选可用工具
+## 动态筛选预注册工具
+创建Agent时预先注册全部工具，运行时根据状态、权限、配置动态筛选可用工具
 
 适用场景：
 - 所有工具预先可知
 - 根据条件动态启用/禁用工具
 - 工具本身固定，但可用性动态变化
 
-示例1：根据state动态选择Tool
+
+### 示例
+- 示例1：根据请求的状态动态选择工具
 ```python
 from langchain.agents import create_agent
 from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
@@ -61,8 +63,7 @@ response = agent.invoke(
 )
 ```
 
-
-示例2：根据存储里的信息，动态选择Tool
+- 示例2：根据存储里的信息，动态选择工具
 ```python
 from dataclasses import dataclass
 from langchain.agents import create_agent
@@ -103,7 +104,7 @@ agent = create_agent(
 )
 ```
 
-示例3：根据运行时上下文，动态选择Tool
+- 示例3：根据运行时上下文，动态选择工具
 ```python
 from dataclasses import dataclass
 from langchain.agents import create_agent
@@ -150,24 +151,28 @@ agent = create_agent(
 ```
 
 
-## Runtime tool registration
+## 运行时动态注册新工具
 在Agent运行过程中动态注册、加载、执行工具
 
-需要通过两个hook实现：
-- wrap_model_call：将动态工具加入请求，即将Dynamic Tool注册到请求里
-- wrap_tool_call：指定动态工具的执行函数，即指定Dynamic Tool由具体哪一个函数执行
-注：wrap_tool_call是必需的，因为Agent需要知道工具对应的具体执行函数，否则无法运行工具是
+通过两个钩子函数实现：
+- **wrap_model_call**\
+  将动态工具加入请求，即将动态工具注册到请求里
+- **wrap_tool_call**\
+  指定动态工具的执行函数，即指定动态工具由某一具体函数执行\
+  wrap_tool_call是必需的，因为Agent需要知道工具对应的具体执行函数，否则工具无法运行
 
 适用场景：
-1) 工具从MCP服务器等外部服务动态发现
-2) 工具根据用户配置动态生成
-3) 统一工具注册中心，多团队共享管理
-   例如，一个公司很多team都有自己的agent，如果没有这个Tool目录/注册表中心，那么需要每一个team的agent都要有自己的注册的Tool以及对应的函数实现，不便于管理\
-   有了这个外部的统一的Tool目录/注册中心，它提供统一管理的Tool列表以及具体实现 (endpoint)\
-   那么各个team就可以从这个中心获取获取Tool ，然后注册给自己的agent(通过wrap_model_call hook), 再将具体的实现函数(通过wrap_tool_call hook)\
-   关于具体的实现函数，如果中心提供了各个tool的endpoint，可以指定endpoint，否则必须在自己的agent上有自己的函数定义
+1) 工具从MCP服务器等外部服务动态发现\
+   说明: 无需本地预定义全部工具，Agent运行时主动连接MCP服务，实时拉取服务端托管的工具清单、调用规则，按需加载使用
+2) 工具根据用户配置动态生成\
+   说明：Agent创建时工具不注册，而是在运行时动态注册的
+3) 统一工具注册中心，支持多团队共享管理\
+   说明：企业内各团队均有独立agent，若无统一注册表，各团队需单独开发、注册工具，运维管理繁琐\
+   搭建外部统一工具中心，集中维护工具清单与接口地址，各团队可从中取用工具，借助钩子函数挂载至自身代理使用\
+   工具执行优先调用中心接口地址，无接口时则本地实现对应函数逻辑
 
-示例：
+
+### 示例
 ```python
 from langchain.tools import tool
 from langchain.agents import create_agent
