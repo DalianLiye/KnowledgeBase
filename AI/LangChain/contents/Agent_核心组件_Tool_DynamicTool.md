@@ -2,15 +2,15 @@
 
 
 # 关于动态工具
-在Agent运行时，动态选择执行合适的工具
+Agent运行时，可以动态选择执行合适的工具
 
-两种实现方式：
+实现方式：
 - 动态筛选预注册工具（预先注册所有工具，运行时动态筛选）
 - 运行时动态注册新工具
 
 
 ## 动态筛选预注册工具
-创建Agent时预先注册全部工具，运行时根据状态、权限、配置动态筛选可用工具
+创建Agent时预先注册全部工具，运行时根据状态、权限、配置等信息动态筛选可用工具
 
 适用场景：
 - 所有工具预先可知
@@ -19,7 +19,7 @@
 
 
 ### 示例
-- 示例1：根据请求的状态动态选择工具
+- 示例1：根据请求状态动态选择工具
 ```python
 from langchain.agents import create_agent
 from langchain.agents.middleware import wrap_model_call, ModelRequest, ModelResponse
@@ -62,8 +62,10 @@ response = agent.invoke(
     },
 )
 ```
+说明:agent调用invoke函数时，传递的state参数里，messages和authenticated字段完全是自定义的，这里定义了什么字段，state_based_tools函数l里request.state就能获取什么字段
 
-- 示例2：根据存储里的信息，动态选择工具
+
+- 示例2：根据存储信息，动态选择工具
 ```python
 from dataclasses import dataclass
 from langchain.agents import create_agent
@@ -152,22 +154,24 @@ agent = create_agent(
 
 
 ## 运行时动态注册新工具
-在Agent运行过程中动态注册、加载、执行工具
+Agent运行过程中动态注册、加载、执行工具
 
-通过两个钩子函数实现：
+通过钩子函数实现：
 - **wrap_model_call**\
-  将动态工具加入请求，即将动态工具注册到请求里
+  将动态工具加入请求，即将动态工具注册到请求里\
+  wrap_model_call触发时机：Agent让大模型思考之前，即:Agent收到用户问题 → 先跑wrap_model_call → 再把请求发给大模型
 - **wrap_tool_call**\
   指定动态工具的执行函数，即指定动态工具由某一具体函数执行\
+  wrap_tool_call触发时机：模型决定调用某个工具之后、真正执行之前，即：模型要调用search_tool → 先跑wrap_tool_call → 再真正执行函数\
   wrap_tool_call是必需的，因为Agent需要知道工具对应的具体执行函数，否则工具无法运行
 
 适用场景：
 1) 工具从MCP服务器等外部服务动态发现\
-   说明: 无需本地预定义全部工具，Agent运行时主动连接MCP服务，实时拉取服务端托管的工具清单、调用规则，按需加载使用
+   无需本地预定义全部工具，Agent运行时主动连接MCP服务，实时拉取服务端托管的工具清单、调用规则，按需加载使用
 2) 工具根据用户配置动态生成\
-   说明：Agent创建时工具不注册，而是在运行时动态注册的
+   Agent创建时工具不注册，而是在运行时动态注册的
 3) 统一工具注册中心，支持多团队共享管理\
-   说明：企业内各团队均有独立agent，若无统一注册表，各团队需单独开发、注册工具，运维管理繁琐\
+   企业内各团队均有独立agent，若无统一注册表，各团队需单独开发、注册工具，运维管理繁琐\
    搭建外部统一工具中心，集中维护工具清单与接口地址，各团队可从中取用工具，借助钩子函数挂载至自身代理使用\
    工具执行优先调用中心接口地址，无接口时则本地实现对应函数逻辑
 
