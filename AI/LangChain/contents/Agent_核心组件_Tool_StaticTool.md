@@ -29,8 +29,7 @@ def get_weather(location: str) -> str:
 agent = create_agent("openai:gpt-5", tools=[search, get_weather])
 ```
 
-- 示例2：添加工具元数据\
-    
+- 示例2：添加工具元数据
 ```python
 from typing import TypedDict
 from langchain.tools import tool
