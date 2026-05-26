@@ -12,7 +12,7 @@ K8s是客户端 + 服务端 (C/S) 架构，其中服务端是主从结构, 即�
 - 官方约定配置：至少1个控制平面 + 至少1个工作节点
 
 k8s集群架构图:\
-<img src="./img/K8s架构_001.jpg" alt="k8s集群架构图" width="500" style="border:1px solid #000;">
+<img src="./img/K8s架构_001.jpg" alt="k8s集群架构图" width="500">
 
 # K8s服务端架构
 K8s服务端架构由以下组件组成：
@@ -28,8 +28,8 @@ K8s服务端架构由以下组件组成：
 控制平面是一种特殊的节点，它担当了K8s集群的master节点角色
 
 架构图如下：\
-<img src="./img/K8s架构_002.png" alt="控制平面架构图01" width="500" style="border:1px solid #ccc;">\
-<img src="./img/K8s架构_003.svg" alt="控制平面架构图02" width="500" style="border:1px solid #ccc;">
+<img src="./img/K8s架构_002.png" alt="控制平面架构图01" width="500">\
+<img src="./img/K8s架构_003.svg" alt="控制平面架构图02" width="500">
 
 
 核心组件：
@@ -90,7 +90,7 @@ K8s服务端架构由以下组件组成：
 
 ## 节点
 K8s的节点架构图如下：\
-<img src="./img/K8s架构_003.svg" alt="节点架构图" width="500" style="border:1px solid #ccc;">
+<img src="./img/K8s架构_003.svg" alt="节点架构图" width="500">
 
 核心组件：
 - **kubelet**\
@@ -152,7 +152,7 @@ K8s的节点架构图如下：\
 
 # K8s分层架构
 K8s分层架构图:\
-<img src="./img/K8s架构_004.jpg" alt="K8s分层架构图" width="500" style="border:1px solid #ccc;">
+<img src="./img/K8s架构_004.jpg" alt="K8s分层架构图" width="500">
 
 - **生态系统**\
   基于K8s搭建的各类工具与应用，附加组件属于该范畴
