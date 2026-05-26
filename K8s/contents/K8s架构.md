@@ -57,7 +57,7 @@ K8s服务端架构由以下组件组成：
     监测一次性任务Job对象，创建Pod运行任务直至执行完成
   - **端点分片控制器(endpointslice controller)**\
     维护并填充EndpointSlice对象，建立Service与Pod之间的关联\
-    具体作用：\
+    具体作用：
     1) 监听：Service、Pod、Node变化
     2) 自动生成/更新：EndpointSlice（端点分片）
     3) 作用：记录每个Service背后到底有哪些Pod（IP + 端口）,让kube-proxy知道把流量转发到哪些Pod
@@ -141,7 +141,7 @@ K8s的节点架构图如下：\
   实现多集群管理，支持跨可用区、跨集群统一调度与访问
 
 - **Fluentd-elasticsearch**\
-  Fluentd + elasticsearch的组合组件，完成集群日志的采集、存储与检索\
+  Fluentd + elasticsearch的组合组件，用于完成集群日志的采集、存储与检索\
   把Fluentd收集到的日志，批量、可靠地发送给Elasticsearch存起来，供后续搜索、分析、可视化（Kibana）用
 
 # K8s分层架构
