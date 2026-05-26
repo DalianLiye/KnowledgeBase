@@ -12,7 +12,7 @@ K8s是客户端 + 服务端 (C/S) 架构，其中服务端是主从结构, 即�
 - 官方约定配置：至少1个控制平面 + 至少1个工作节点
 
 k8s集群架构图:\
-<img src="./img/K8s架构_001.jpg" alt="k8s集群架构图" width="500" style="border:1px solid #000;>
+<img src="./img/K8s架构_001.jpg" alt="k8s集群架构图" width="500" style="border:1px solid #000;">
 
 # K8s服务端架构
 K8s服务端架构由以下组件组成：
