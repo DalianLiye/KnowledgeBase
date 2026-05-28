@@ -18,4 +18,4 @@ K8s集群下有三个Node，配置如下：
 **注：**\
 Node1和Node2用来提供应用服务，Node3作为网关节点接受外部请求，并根据请求内容将流量转发至Node1和Node2\
 <img src="./img/Ingress_001.png" alt="ingress1" width="500">\
-<img src="./img/Ingress_002.svg"" alt="ingress2" width="500">
+<img src="./img/Ingress_002.svg" alt="ingress2" width="500">
