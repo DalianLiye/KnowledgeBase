@@ -45,7 +45,7 @@ StatefulSet要求版本: >= K8s v1.5
 
 - **VolumeClaim Template(存储卷模板)**\
   持久化存储模板，自动为每一个Pod创建独立PVC，实现数据持久化\
-  <img src="./img/资源_API_Apps_001.svg" alt="statefulset" width="500"> 
+  <img src="./img/StatefulSet_001.svg" alt="statefulset" width="500"> 
 
 
 # StatefulSet示例
