@@ -48,27 +48,9 @@ K8s服务端架构由以下组件组成：
 - **kube-controller-manager(控制器管理器)**\
   管理各种类型的控制器, 负责运行控制器进程
 
-  **关于控制器**\
-  控制器是K8s集群的组件，包含多种类型，负责持续将集群实际状态调整为期望状态\
-  控制器对K8s各类资源进行管理，资源涵盖Pod、节点、任务、调度等不同层面
-  
   从逻辑上讲，每个控制器都是独立进程，为简化部署与维护，它们被编译为同一个可执行文件，统一在一个进程中运行\
   这样就可以减少进程数量、降低部署和运维复杂度，不用逐个启停、维护多个组件\
   K8s中这一整合后的进程就是kube-controller-manager
-
-  控制器主要包括：
-  - **节点控制器(node controller)**\
-    负责节点出现故障时，做出监测、通知与响应处理
-  - **任务控制器(job controller)**\
-    监测一次性任务Job对象，创建Pod运行任务直至执行完成
-  - **端点分片控制器(endpointslice controller)**\
-    维护并填充EndpointSlice对象，建立Service与Pod之间的关联\
-    具体作用：
-    1) 监听：Service、Pod、Node变化
-    2) 自动生成/更新：EndpointSlice（端点分片）
-    3) 作用：记录每个Service背后到底有哪些Pod（IP + 端口）,让kube-proxy知道把流量转发到哪些Pod
-  - **服务账号控制器(servce account controller)**\
-    为新建命名空间自动创建默认服务账号
 
 - **cloud-controller-manager(云控制器管理器)**\
   用于对接第三方云平台的接口，实现相关资源管理功能\
