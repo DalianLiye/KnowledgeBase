@@ -2,7 +2,7 @@
 
 
 # 关于RBAC
-全称：Role Based Access Control, RBAC
+全称：Role Based Access Control
 
 RBAC相关对象主要包括:
 - Role
@@ -17,7 +17,7 @@ RBAC相关对象主要包括:
 例如：可配置查看Pod、查看Deployment等权限，专门用于对当前命名空间内的资源做权限管控
 
 **注:**
-- 需配合RoleBinding使用，才能将权限授予用户、用户组、ServiceAccount等主体
+需配合RoleBinding使用，才能将权限授予用户、用户组、ServiceAccount等主体
 
 
 # RoleBinding
