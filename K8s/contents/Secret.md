@@ -23,3 +23,70 @@ Secret类型:
 
 - **kubernetes.io/dockerconfigjson**\
   专门存储私有镜像仓库的登录认证信息，用于拉取私有镜像
+
+
+## secret
+与ConfigMap类似，用于存储配置信息，但是主要用于存储敏感信息，需要加密的信息\
+secret可以提供数据加密，解密的功能(base64编码解码)
+
+在创建secret时，要注意如果要加密的字符中，包含了有特殊字符，需要使用转义字符转义\
+例如,"$"需要写成"\$", 也可以对特殊字符使用单引号描述，这样就不需要转义了\
+例如, 1$289*-! 可以写成'1$289*-!'
+
+通过literal方式创建generic secret, 执行命令：
+```shell
+kubectl create secret generic orig-secret --from-literal=username=admin --from-literal=password='1$289*-!' # password如果不进行转义或单引号括起来，secret虽然创建成功，但其实password的值是有缺失的
+```
+
+创建docker-registry secret，执行命令：
+```shell
+kubectl create secret docker-registry <name> --docker-username=<username> --docker-password=<password> --docker-email=<email address> [--docker-server=<server>]
+```
+
+查看docker-registry secret的详细信息，执行命令：
+```shell
+kubectl eidt secret <secret_name> 
+
+# 将.dockerconfigjson的value解码，就可以看到明文
+echo <.dockerconfigjson string> | base64 -d
+```
+
+执行kubectl create命令创建如下Pod，文件名：private-image-pull-pod.yaml
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: private-image-pull-pod
+spec:
+  imagePullSecrets: # 配置登录docker registry
+  - name: harbor-secret  # 设置secret name，用这个secret的credentials信息登录镜像私有库
+  containers:
+  - name: nginx
+    image: 192.168.113.122:8858/opensource/nginx:1.9.1  # 镜像位于私有仓库,且本地不存在
+    command: ["/bin/sh","-c", "sleep 3600"]
+    imagePullPolicy: IfNotPresent
+    env:
+    - name: JAVA_VM_OPTS
+      valueFrom: 
+        configMapKeyRef:
+          name: test-env-config
+          key: JAVA_OPTS_TEST     
+     - name: APP
+       valueFrom:
+         configMapKeyRef:
+           name: test-env-config
+           key: APP_NAME
+    volumeMounts:  # 加载数据卷
+    - name: db-config  
+      mountPath: "/usr/local/mysql/conf"  
+      readOnly: true  # 是否只读
+  volumes:  #数据卷挂载， configMap，sercret
+    - name: db-config  # 数据卷的名字，名字可以自定义
+      configMap: #数据卷类型为configMap
+        name: test-dir-config  
+        items:  
+        - key: "db.properties"  # configmap中的key
+          path: "db.properties"  # 将该key中的值转换为文件
+  restartPolicy: Never
+```
+注：额外配置.sepc.imagePullSecrets
