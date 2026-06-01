@@ -47,10 +47,8 @@
   - 最新修改触发新一轮滚动更新
 
 
-## Deployment
 
-
-### 创建Deployment
+# 创建Deployment
 Deployment的创建方式有以下几种
 
 - **定义配置文件**\
@@ -67,7 +65,7 @@ Deployment的创建方式有以下几种
   ```
 
 
-### 查看Deployment
+# 查看Deployment
 查看Deployment信息，执行命令：
 ```shell
 kubectl get deployment  #返回nginx-deploy记录
@@ -116,7 +114,7 @@ spec:
 ```
 
 
-### 滚动更新
+# 滚动更新
 
 - **示例**\
   以下是当前Deployment的配置信息
@@ -201,7 +199,7 @@ kubectl get po --show-labels
 r2和r3都会被记录到历史中
 
 
-### 回滚
+# 回滚
 Deployment可以执行回滚操作，来回退到一个历史版本\
 例如：当前的Deployment不稳定，一直crash looping，可以执行回滚操作，将其回退到历史上某一个稳定的版本
 
@@ -269,7 +267,7 @@ Deployment可以执行回滚操作，来回退到一个历史版本\
   ```
 
 
-### 扩缩容
+# 扩缩容
 可以通过以下两种方式进行扩缩容
 
 - **kube scale命令**\
@@ -284,7 +282,7 @@ Deployment可以执行回滚操作，来回退到一个历史版本\
 注: 扩容与缩容只是直接创建副本数，没有更新Pod template, 因此不会创建新的rs
 
 
-### 暂停与恢复
+# 暂停与恢复
 由于每次对Pod template中的信息发生修改后，都会触发更新Deployment操作\
 那么此时如果频繁修改信息，都会产生多次更新，而实际上只需要执行最后一次更新即可\
 当出现此类情况时,就可以先暂停Deployment 的rollout

@@ -32,22 +32,22 @@ Service的核心场景仍是集群内部通信，对外暴露通常是附加能�
 - **南北流量**\
   纵向流量，通过Ingress实现k8s内部服务暴漏外网访问
 
-<img src="./img/资源_API_Core_003.png" alt="东西南北流量" width="500">
+<img src="./img/Service_001.png" alt="东西南北流量" width="500">
 
 
 
-
-## service
+# 常用命令
 ```shell
 kubectl get svc
 kubectl get endpoints
 
 endpoint返回的IP端口是pod所在node的ip和端口
 ```
-![service](../img/10_001.png)
+
+<img src="./img/Service_002.png" alt="service" width="500">
 
 
-### 创建Service
+# 创建Service
 Service的创建方式有以下几种
 - **定义配置文件**\
   执行命令：
@@ -66,7 +66,7 @@ Service的创建方式有以下几种
   ```
 
 
-### Service命令操作
+# Service命令操作
 创建service配置文件如下，文件名nginx-svc.yaml
 ```yaml
 apiVersion: v1  
@@ -107,7 +107,7 @@ curl http://nginx-svc.default
 ```
 
 
-### 代理k8s外部服务
+# 代理K8s外部服务
 案例
 - 各环境访问名称统一	
 - 访问k8s集群外的其他服务	
@@ -154,7 +154,7 @@ subsets:
 ```
 
 
-### 反向代理外部域名
+# 反向代理外部域名
 除了可以通过配置IP的方式，也可以配置为域名的方式
 ```shell
 apiVersion: v1
@@ -169,7 +169,7 @@ spec:
 ```
 
 
-### 常用类型
+# 常用类型
 - **ClusterIP**\
   只能在集群内部使用，不配置类型的话默认就是ClusterIP
 

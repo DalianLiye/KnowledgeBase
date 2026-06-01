@@ -100,10 +100,8 @@ PVC保证数据持久化，Pod重启后数据不丢失
 - 为保证数据隔离与安全, 在删除StatefulSet时，一般不会同步删除PVC和PV，使数据得以保留
 - StatefulSet依赖Headless Service提供稳定DNS解析，必须先创建Headless Service，再创建StatefulSet
 
-## StatefulSet
 
-
-### 创建StatefulSet
+# 创建StatefulSet
 通过以下配置文件创建StatefulSet，文件名web.yaml
 ```yaml
 ---
@@ -225,7 +223,7 @@ nslookup web-1.nginx
 ![screenshot](../img/09_001.png)
   
 
-### 扩缩容
+# 扩缩容
 通过以下方式实现扩缩容
 
 - **扩容**
@@ -242,14 +240,14 @@ nslookup web-1.nginx
   statefulSet扩缩容是按照顺序进行的
 
 
-### 镜像更新
+# 镜像更新
 可以为statefulSet更新镜像，目前还不支持直接更新image，需要patch来间接实现
 ```shell
 kubectl patch statefulset web -type='json' -p='[{"op":"replace","path": "/spec/template/spec/containers/0/image","value":"nginx:1.9.1"}]'
 ```
 
 
-### StatefulSet更新
+# StatefulSet更新
 StatefulSet的更新操作有以下两种类型
 
 - **RollingUpdate**\
@@ -275,7 +273,7 @@ StatefulSet的更新操作有以下两种类型
   位置：.spec.updateStrategy.type = "OnDelete"
 
 
-### 删除StatefulSet
+# 删除StatefulSet
 删除statefulset包括删除statefulset和headless service\
 删除statefulset包括级联删除和非级联删除
 
@@ -292,14 +290,14 @@ StatefulSet的更新操作有以下两种类型
   ```
 
 
-### 删除service
+# 删除service
 删除statefulset后，与之关联的service不会被自动删除，因此需要手工删除headless service
 ```shell
 kubectl delete service nginx
 ```
 
 
-### 删除pvc
+# 删除pvc
 statefulset删除后，PVC还会保留着，如果数据不再使用的话也需要删除
 ```shell
 kubectl delete pvc <pvc_name>

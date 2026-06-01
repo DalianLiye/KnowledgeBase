@@ -18,10 +18,7 @@ DaemonSet通过节点选择器（selector）筛选节点，在每个匹配节点
 
 
 
-## DaemonSet
-
-
-### 创建DaemonSet
+# 创建DaemonSet
 通过以下配置创建DaemonSet，文件名：fluentd-demo.yaml
 ```yaml
 apiVersion: apps/v1
@@ -110,7 +107,7 @@ DaemonSet配置文件中，spec.selector.matchlabels的标签值要跟spec.templ
 只有一一对应，DaemonSet才知道它要将这个yaml文件里的pod发布到指定的node上
 
 
-### 指定Node节点
+# 指定Node节点
 DaemonSet是一种特殊的控制器，用于确保集群中每个（或符合条件的）节点上都运行一个 Pod 副本\
 它会忽略Node的unschedulable状态，即使节点被标记为 unschedulable，DaemonSet仍然会在该节点上创建 Pod
 
@@ -125,7 +122,7 @@ DaemonSet在指定的Node节点运行Pod主要通过以下方式：
   调度到满足条件的Pod所在的Node上
 
 
-### DaemonSet更新
+# DaemonSet更新
 当修改DaemonSet的 spec.template （例如更新容器镜像、环境变量、资源限制等）\
 默认情况下，控制器会逐个节点滚动更新其管理的DaemonSet Pod，替换旧的Pod为新的Pod
 
