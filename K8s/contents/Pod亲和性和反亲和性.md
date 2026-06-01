@@ -1,14 +1,12 @@
-### PodAffinity
-Pod亲和性，将Pod一定或尽量调度到与指定的其他Pod所在的同一节点上\
-Pod亲和性包含以下类型：
+[目录](../目录.md)
 
-- **requiredDuringSchedulingIngoredDuringExecution**\
-  硬亲和力，一定要部署到一起
-- **preferredDuringSchedulingIngoredDuringExecution**\
-  软亲和力，尽量部署到一起
 
-**场景：**\
-有两个Pod，商品Pod和订单Pod，需要将它们俩运行在一个节点上，就可以通过Pod亲和性来实现
+# Pod亲和性(PodAffinity)
+将Pod一定或尽量调度到与指定的其他Pod所在的同一节点上
+
+
+## 示例
+有两个Pod，商品Pod和订单Pod，通过Pod亲和性来实现将它们俩运行在一个节点上
 
 ```yaml
 apiVersion: v1
@@ -43,10 +41,5 @@ spec:
 ```
 
 
-### PodAntiAffinity
-Pod反亲和性，将Pod一定或尽量不要调度到与指定的其他Pod所在的同一节点上\
-Pod反亲和性包含以下类型：
-- **requiredDuringSchedulingIngoredDuringExecution**\
-  硬亲和力，一定不要部署到一起
-- **preferredDuringSchedulingIngoredDuringExecution**\
-  软亲和力，尽量不要部署到一起
+# Pod反亲和性(PodAntiAffinity)
+将Pod一定或尽量不要调度到与指定的其他Pod所在的同一节点上
