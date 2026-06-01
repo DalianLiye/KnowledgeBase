@@ -1,66 +1,28 @@
-
-# 关于K8s
 [关于K8s](./contents/关于K8s.md)&nbsp;&nbsp;
 [K8s架构](./contents/K8s架构.md)
-
-
-# 环境搭建
 [硬件安装](./contents/K8s-硬件安装.md)&nbsp;&nbsp;
 [软件安装](./contents/K8s-软件安装.md)
-
-
-# 核心概念
-
-
-## 概览
 [API](./contents/API.md)&nbsp;&nbsp;
-[kubectl](./contents/kubectl.md)&nbsp;&nbsp;
-[关于资源](./contents/关于资源.md)&nbsp;&nbsp;
-[资源分类](./contents/资源分类.md)
-
-### 对象
+[kubectl](./contents/kubectl.md)
 [命名空间](./contents/Namespace.md)&nbsp;&nbsp;
 [规约和状态](./contents/规约和状态.md)
 [标签和选择器](./contents/标签和选择器.md)
-
-
-
-## 架构
 [控制器](./contents/控制器.md)&nbsp;&nbsp;
 [节点](./contents/Node.md)
-
-
-## 存储
 [Volume](./contents/Volume.md)&nbsp;&nbsp;
 [Persistent Volume(PV)](./contents/Persistent_Volume.md)&nbsp;&nbsp;
 [Persistent Volume Claim(PVC)](./contents/Persistent_Volume_Claim.md)&nbsp;&nbsp;
 [PV和PVC](./contents/PV和PVC.md)&nbsp;&nbsp;
 [Container Storage Interface(CSI)](./contents/Container_Storage_Interface.md)
-
-
-## 配置
 [ConfigMap](./contents/ConfigMap.md)&nbsp;&nbsp;
 [Secret](./contents/Secret.md)
-
-
-## 策略
 [LimitRange](./contents/LimitRange.md)
-
-
-## 工作负载
 [Horizontal Pod Autoscaling(HPA)](./contents/Horizontal_Pod_Autoscaling.md)
-
-
-### Pod相关
 [Pod](./contents/Pod.md)&nbsp;&nbsp;
 [Pod生命周期](./contents/Pod生命周期.md)&nbsp;&nbsp;
 [初始化容器](./contents/初始化容器.md)&nbsp;&nbsp;
 [Pod完整示例](./contents/Pod完整示例.md)&nbsp;&nbsp;
-[探针](./contents/探针.md)&nbsp;&nbsp;
 [Downward API](./contents/Downward_API.md)
-
-
-### 工作负载管理
 [Deployment(Deploy)](./contents/Deployment.md)&nbsp;&nbsp;
 [ReplicaSet(RS)](./contents/ReplicaSet.md)&nbsp;&nbsp;
 [StatefulSet](./contents/StatefulSet.md)&nbsp;&nbsp;
@@ -68,31 +30,13 @@
 [Job](./contents/Job.md)&nbsp;&nbsp;
 [CronJob](./contents/CronJob.md)&nbsp;&nbsp;
 [ReplicationController(RC)](./contents/ReplicationController.md)
-
-
-## 服务，负载均衡和联网
 [Service](./contents/Service.md)&nbsp;&nbsp;
 [Ingress](./contents/Ingress.md)
-
-
-## 安全
 [RBAC](./contents/RBAC.md)&nbsp;&nbsp;
 [账户](./contents/账户.md)&nbsp;&nbsp;
 [身份认证与权限](./contents/身份认证与权限.md)
-
-
-## 调度，抢占和驱逐
 [亲和性](./contents/亲和性.md)&nbsp;&nbsp;
 [Pod亲和性和反亲和性](./contents/Pod亲和性和反亲和性.md)&nbsp;&nbsp;
 [Node亲和性](./contents/Node亲和性.md)&nbsp;&nbsp;
 [污点和容忍度](./contents/污点和容忍度.md)
-
-
-
-
-
-
-
-
-  - [资源汇总](./contents/资源_总结.md)
- 
+[资源汇总](./contents/资源_总结.md)
