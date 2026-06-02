@@ -2,6 +2,7 @@
 
 
 # 关于SubPath
+SubPath用于挂载ConfigMap或secret的某一个key到Pod容器指定路径下的单文件
 使用ConfigMap或secret挂载到目录的时候，会将容器中原来的目录覆盖掉\
 此时可能只想覆盖目录中的某一个文件，但是这样的操作会覆盖整个文件夹，因此需要使用到subpath
 
@@ -26,19 +27,31 @@ subPath的配置方式如下：
 ```yaml
 containers:
 ....
-  volumeMounts:
-  - mountPath: /etc/nginx/nginx.conf 
-    name: config-volume
-    subPath: etc/nginx/nginx.conf # 与volumes.[0].items.path 相同
+volumeMounts:
+- mountPath: /etc/nginx/nginx.conf 
+  name: config-volume
+  subPath: etc/nginx/nginx.conf  # 必须和 volumes.items.path 一样
+
 volumes:
-- configMap:
-  name: nginx-conf  # configMap名字
-  items:
-    key: nginx.conf  #configMap中的文件名
-    path: etc/nginx/nginx.conf  # subpath路径
+- name: config-volume  # 你这里漏写了 name，必须和上面对应
+  configMap:
+    name: nginx-conf
+    items:
+    - key: nginx.conf    # ConfigMap 里的 key
+      path: etc/nginx/nginx.conf  # 不能以 / 开头
 ```
 **注：**\
 - 定义volumes时需要增加items属性，配置key和path，且path的值不能从/开始
 - 在容器的volumeMounts中增加subpath属性，该值与volumes中的items.path的值相同
 
 
+    volumeMounts:
+    - name: db-config
+      mountPath: "/usr/local/mysql/conf/db.properties"  # 指向【具体文件】
+      subPath: "db.properties"                           # 关键：加了 subPath！
+      readOnly: true
+  volumes:
+    - name: db-config
+      configMap:
+        name: test-dir-config  # 还是用同一个 configmap
+  restartPolicy: Never
