@@ -7,13 +7,18 @@
 使用时可挂载或注入到Pod中，无需将敏感数据直接写入镜像或Pod配置清单
 
 **注：**\
-Secret仅做Base64 编码（非强加密），生产环境可配合权限策略进一步加固安全
+- Secret仅做Base64 编码（非强加密），生产环境可配合权限策略进一步加固安全
+- 在创建secret时，要注意如果要加密的字符中，包含了有特殊字符，需要使用转义字符转义\
+  例如,"$"需要写成"\$", 也可以对特殊字符使用单引号描述，这样就不需要转义了\
+  例如, 1$289*-! 可以写成'1$289*-!'
+
 
 使用方式：
 - Volume挂载
 - 环境变量注入
 
-Secret类型:
+# Secret类型
+secret类型包括：
 - **Service Account**\
   用于Pod访问K8s API的身份凭证，由集群自动创建，会自动挂载到Pod内路径：/run/secrets/kubernetes.io/serviceaccount
 
@@ -25,14 +30,7 @@ Secret类型:
   专门存储私有镜像仓库的登录认证信息，用于拉取私有镜像
 
 
-## secret
-与ConfigMap类似，用于存储配置信息，但是主要用于存储敏感信息，需要加密的信息\
-secret可以提供数据加密，解密的功能(base64编码解码)
-
-在创建secret时，要注意如果要加密的字符中，包含了有特殊字符，需要使用转义字符转义\
-例如,"$"需要写成"\$", 也可以对特殊字符使用单引号描述，这样就不需要转义了\
-例如, 1$289*-! 可以写成'1$289*-!'
-
+# 示例
 通过literal方式创建generic secret, 执行命令：
 ```shell
 kubectl create secret generic orig-secret --from-literal=username=admin --from-literal=password='1$289*-!' # password如果不进行转义或单引号括起来，secret虽然创建成功，但其实password的值是有缺失的
@@ -90,3 +88,8 @@ spec:
   restartPolicy: Never
 ```
 注：额外配置.sepc.imagePullSecrets
+
+
+# 不可变secret
+对于一些敏感服务的配置文件，在线上有时是不允许修改的\
+此时在配置secret时可以设置immutable：true来禁止修改

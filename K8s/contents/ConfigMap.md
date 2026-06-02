@@ -2,115 +2,115 @@
 
 
 # 关于ConfigMap
-用于存储键值（key-value）格式的非敏感配置数据，可被挂载或注入到Pod中，供容器读取使用\
-ConfigMap可集中统一管理应用配置，多个Pod/容器可共用同一份配置，避免逐个单独维护，提升配置管理效率
+用于存储键值（key-value）格式的非敏感配置数据\
+可以通过环境变量或挂载文件的方式注入到Pod中，供容器读取使用\
+ConfigMap实现了应用与配置解耦，支持多Pod、多容器共享同一配置，集中管理、便于修改，大幅提升配置维护效率
 
-**注：**\
-由于ConfigMap采用的是普通明文配置，敏感数据建议使用Secret
-
-
-## ConfigMap
-configmap提供了可以使用明文存储键-值对信息的方式
+**注：**
+- ConfigMap存储明文数据，不提供任何加密能力
+- 敏感信息（密码、密钥、Token、证书）严禁存入 ConfigMap，必须使用 Secret
 
 
-### 创建ConfigMap
-- **示例1：** 基于文件夹创建configmap\
-  创建db.properties文件，内容如下：
-  ```shell
-  username=root
-  password=admin
-  ```
+# 创建ConfigMap
 
-  创建redis.properties文件，内容如下：
-  ```shell
-  host: 127.0.0.1
-  port: 6379
-  ```
+创建ConfigMap的方式主要包括：
+- 基于文件夹
+- 基于文件（推荐）
+- 直接指定key-value
 
 
-  将db.properties和redis.properties两个文件保存至/test文件夹下\
-  进入到/test文件夹同级目录，创建configmap，执行命令：
-  ```shell
-  kubectl create configmap test-dir-config --from-file=test/
-  ```
+## 基于文件夹
+创建db.properties文件，内容如下：
+```shell
+username=root
+password=admin
+```
 
-  获取configmap列表，执行命令：
-  ```shell
-  kubectl get cm  # 可以查看刚才看到的configmap
-  ```
-  ![screenshot1](../img/11_001.png)
+创建redis.properties文件，内容如下：
+```shell
+host: 127.0.0.1
+port: 6379
+```
 
-  查看configmap具体信息，执行命令：
-  ```shell
-  kubectl describe cm test-dir-config
-  ```
-  ![screenshot2](../img/11_002.png)
+将db.properties和redis.properties两个文件保存至/test文件夹下\
+进入到/test文件夹同级目录，创建configmap，执行命令：
+```shell
+kubectl create configmap test-dir-config --from-file=test/
+```
 
+获取configmap列表，执行命令：
+```shell
+kubectl get cm  # 可以查看刚才看到的configmap
+```
+<img src="./img/ConfigMap_001.png" alt="ConfigMap001" width="500">
 
-- **示例2:** 基于文件创建configmap（推荐）\
-  创建application.yaml文件，内容如下：
-  ```yaml
-  spring:
-    application:
-      name: test-app
-  server: 
-    port: 8080
-  ```
-
-  将application.yaml文件保存至/test目录下
-
-  创建configmap，执行命令：
-  ```shell
-  kubectl create configmap spring-boot-test-yaml --from-file=/test/application.yaml
-  ```
-
-  获取configmap列表，执行命令：
-  ```shell
-  kubectl get cm  # 可以查看刚才看到的configmap
-  ```
-  ![screenshot3](../img/11_003.png)
+查看configmap具体信息，执行命令：
+```shell
+kubectl describe cm test-dir-config
+```
+<img src="./img/ConfigMap_002.png" alt="ConfigMap002" width="500">
 
 
-  查看configmap具体信息，执行命令：
-  ```shell
-  kubectl describe cm spring-boot-test-yaml
-  ```
-  ![screenshot4](../img/11_004.png)
+## 基于文件
+创建application.yaml文件内容如下，并保存至/test目录下
+```yaml
+spring:
+  application:
+    name: test-app
+server: 
+  port: 8080
+```
+
+创建configmap，执行命令：
+```shell
+kubectl create configmap spring-boot-test-yaml --from-file=/test/application.yaml
+```
+
+获取configmap列表，执行命令：
+```shell
+kubectl get cm  # 可以查看刚才看到的configmap
+```
+<img src="./img/ConfigMap_003.png" alt="ConfigMap003" width="500">
+
+查看configmap具体信息，执行命令：
+```shell
+kubectl describe cm spring-boot-test-yaml
+```
+<img src="./img/ConfigMap_004.png" alt="ConfigMap004" width="500">
+
+再次通过以下方式创建configmap，执行命令：
+```shell
+kubectl create configmap spring-boot-test-alises-yaml --from-file=app.yml=/test/application.yaml
+```
+
+查看configmap详细信息，执行命令：
+```shell
+kubectl describe cm spring-boot-test-alises-yaml
+
+kubectl describe configmap/spring-boot-test-alises-yaml  #另一种表达方式
+```
+<img src="./img/ConfigMap_005.png" alt="ConfigMap005" width="500">\
+注：文件名变成了app.yml, 而不是application.yaml
 
 
-  再次通过以下方式创建configmap，执行命令：
-  ```shell
-  kubectl create configmap spring-boot-test-alises-yaml --from-file=app.yml=/test/application.yaml
-  ```
+## 直接指定key-value
+一般不建议使用该方式，但如果参数少是可以
 
-  查看configmap详细信息，执行命令：
-  ```shell
-  kubectl describe cm spring-boot-test-alises-yaml
+创建configmap，执行命令：
+```shell
+kubectl create configmap test-key-value-config  --from-literal=username=root --from-literal=password=admin
+```
 
-  kubectl describe configmap/spring-boot-test-alises-yaml  #另一种表达方式
-  ```
-  ![screenshot5](../img/11_005.png)\
-  注：文件名变成了app.yml, 而不是application.yaml
-
-
-- **示例3：** 直接指定key-value\
-  一般不建议使用该方式，但如果参数少是可以
-
-  创建configmap，执行命令：
-  ```shell
-  kubectl create configmap test-key-value-config  --from-literal=username=root --from-literal=password=admin
-  ```
-
-  查看configmap详细信息，执行命令：
-  ```shell
-  kubectl describe configmap test-key-value-config
-  ```
-  ![screenshot6](../img/11_006.png)\
-  注：通过键值对直接创建cm是没有文件名的
+查看configmap详细信息，执行命令：
+```shell
+kubectl describe configmap test-key-value-config
+```
+<img src="./img/ConfigMap_006.png" alt="ConfigMap006" width="500">\
+注：通过键值对直接创建cm是没有文件名的
 
 
 
-### 使用ConfigMap
+# 使用ConfigMap
 
 - **示例1**\
   创建configmap，执行命令：
@@ -122,8 +122,7 @@ configmap提供了可以使用明文存储键-值对信息的方式
   ```shell
   kubectl describe configmap test-env-config
   ```
-  ![screenshot7](../img/11_007.png)
-
+  <img src="./img/ConfigMap_007.png" alt="ConfigMap007" width="500">
 
 
   执行kubectl create命令创建如下Pod，文件名env-test-pod.yaml文件
@@ -156,7 +155,7 @@ configmap提供了可以使用明文存储键-值对信息的方式
   ```shell
   kubectl logs -f test-env-pod  # -f不是file，是follow的意思
   ```
-  ![screenshot8](../img/11_008.png)
+  <img src="./img/ConfigMap_008.png" alt="ConfigMap008" width="500">
 
 
 - **示例2**\
@@ -205,54 +204,11 @@ configmap提供了可以使用明文存储键-值对信息的方式
   ls /usr/local/mysql/conf  # 可以发现db.properties文件存在
   cat /usr/local/mysql/conf/db.properties  # 内容跟创建configmap时一致
   ```
-  ![screenshot9](../img/11_009.png)
-
-
-  ## 配置的热更新
-通常会将项目的配置文件作为configmap，然后挂载到Pod
-
-如果更新configmap中的配置，它是否也会将更新同步到pod中，会分以下几种情况：
-- **默认方式**\
-  会更新\
-  更新周期：更新时间+缓存时间
-
-- **subPath**\
-  不会更新\
-  对于subPath的方式，可以取消subPath的使用，将配置文件挂载到一个不存在的目录，避免目录的覆盖，然后再利用软连接的形式，将该文件链接到目标位置\
-  但是如果目标位置原本就有文件，可能无法创建软链接，此时可以基于前面讲过的poststart操作执行删除命令，将默认的文件删除即可\
-  注：poststart操作和pod中的command会有冲突，也可以将删除操作放在初始化容器里执行
-
-  例如：configmap的配置文件是nginx.conf, 它原来是挂载到容器的/etc/nginx/nginx.conf的，同时/etc/nginx下还有很多其他的文件\
-  可以先将挂载路径改为容器的/configmap/nginx/nginx.conf， /configmap/nginx/是专门为configmap挂载，里面只有nginx.conf文件\
-  然后在/etc/nginx/下创建一个软链接，指向/configmap/nginx/nginx.conf
-
-  每次更改，都可以删除文件，删除操作可以在初始化容器里执行
-
-- **变量形式**\
-  如果pod中的一个变量是从configmap或secret中得到，同样也是不会更新的
-
-**示例:**
-
-- **示例1：** 通过edit命令直接修改configMap\
-  修改db.properties里的value值，执行命令：
-  ```shell
-  kubectl edit configmap test-dir-config
-  ```
-  eidt之后，进入容器内部后，需要过一段时间(更新时间+缓存时间)，会发现configmap挂载到容器内部的db.properties文件里的值也被更新
+  <img src="./img/ConfigMap_009.png" alt="ConfigMap009" width="500">
 
 
 
-- **示例2：** 通过replace替换\
-  由于configmap的创建通常都是基于文件创建的，并不会编写yaml配置文件，因此修改时也是直接修改配置文件，而replace是没有--from-file参数的，因此无法实现基于源配置文件的替换，可以通过以下方式实现\
-  configmap是根据宿主机上的db.properties文件创建的，先修改宿主机的该文件，然后再执行以下命令：
-  ```shell
-  kubectl create cm test-dir-conig --from-file=db.properties --dry-run -o yaml | kubectl replace -f-
-  ```
-  注：该命令的重点在于--dry-run参数，该参数的意思打印yaml文件，但不会将文件发送给api server，再结合-o yaml输出yaml文件就可以得到一个配置好但是没有发给apiserver的文件，然后再结合replace监听控制台输出得到yaml数据即可实现替换
-
-
-
-## 不可变secret和configmap
+# 不可变configmap
 对于一些敏感服务的配置文件，在线上有时是不允许修改的\
 此时在配置configmap时可以设置immutable：true来禁止修改\
-![screenshot10](../img/11_010.png)
+<img src="./img/ConfigMap_010.png" alt="ConfigMap010" width="500">

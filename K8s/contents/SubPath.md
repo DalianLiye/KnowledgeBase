@@ -37,8 +37,8 @@ volumes:
     key: nginx.conf  #configMap中的文件名
     path: etc/nginx/nginx.conf  # subpath路径
 ```
-**说明：**\
-1）定义volumes时需要增加items属性，配置key和path，且path的值不能从/开始\
-2）在容器的volumeMounts中增加subpath属性，该值与volumes中的items.path的值相同
+**注：**\
+- 定义volumes时需要增加items属性，配置key和path，且path的值不能从/开始
+- 在容器的volumeMounts中增加subpath属性，该值与volumes中的items.path的值相同
 
 
