@@ -2,11 +2,14 @@
 
 
 # 关于SubPath
-SubPath用于挂载ConfigMap或secret的某一个key到Pod容器指定路径下的单文件
-使用ConfigMap或secret挂载到目录的时候，会将容器中原来的目录覆盖掉\
-此时可能只想覆盖目录中的某一个文件，但是这样的操作会覆盖整个文件夹，因此需要使用到subpath
+使用ConfigMap或secret挂载到容器整个目录时，容器的目录整体会跟着ConfigMap或secret同步更新\
+这样，如果目录里有其他文件，那么也会被覆盖更新
 
-比如以下配置，pod启动后，会将整个/usr/local/mysql/conf目录覆盖，整个目录原来的文件就都没有了，会只有db.properties
+通过SubPath就可以规避这个问题，它可以挂载ConfigMap或secret的某一个key到Pod容器指定路径下的单个文件
+
+**示例1:**\
+Pod启动后，将ConfigMap test-dir-config下key=db.properties的内容导出到容器的/usr/local/mysql/conf/db.properties文件内\
+此时，如果容器的/usr/local/mysql/conf/目录下有其他文件，那么就会被清理掉，只剩下db.properties这个文件
 ```yaml
 volumeMounts:  # 加载数据卷
     - name: db-config  
@@ -22,8 +25,20 @@ volumeMounts:  # 加载数据卷
 ```
 
 
-# SubPath配置
-subPath的配置方式如下：
+
+**示例2:**\
+使用subPath同步ConfigMap的key到单个文件, 具体执行步骤：
+1) Pod启动，K8s解析volumes配置,找到ConfigMap：nginx-conf
+2) K8s为当前Pod创建独立虚拟卷\
+   Pod挂载ConfigMap时，都会单独分配一个独立的虚拟卷, 这个卷和容器原文件系统完全隔离
+3) 根据items，读取ConfigMap：nginx-conf中key=nginx.conf的value内容在独立虚拟卷内生成文件\
+   生成文件的路径为: 虚拟卷根/etc/nginx/nginx.conf\
+   因此，items.path不能以/开头，因为它是虚拟卷内的相对路径，不是容器路径
+4) K8s解析volumeMounts + subPath\
+   K8s通过subPath会去独立虚拟卷里，找这个路径的文件：虚拟卷根/etc/nginx/nginx.conf\
+   因此，subPath必须和volumes.items.path完全一样，否则K8s无法在独立虚拟卷找到文件
+5) K8s将独立虚拟卷中的文件，挂载到容器目标文件
+
 ```yaml
 containers:
 ....
@@ -40,18 +55,8 @@ volumes:
     - key: nginx.conf    # ConfigMap 里的 key
       path: etc/nginx/nginx.conf  # 不能以 / 开头
 ```
-**注：**\
-- 定义volumes时需要增加items属性，配置key和path，且path的值不能从/开始
-- 在容器的volumeMounts中增加subpath属性，该值与volumes中的items.path的值相同
 
 
-    volumeMounts:
-    - name: db-config
-      mountPath: "/usr/local/mysql/conf/db.properties"  # 指向【具体文件】
-      subPath: "db.properties"                           # 关键：加了 subPath！
-      readOnly: true
-  volumes:
-    - name: db-config
-      configMap:
-        name: test-dir-config  # 还是用同一个 configmap
-  restartPolicy: Never
+
+
+

@@ -1,8 +1,8 @@
 [目录](../目录.md)
 
 
-# Pod亲和性(PodAffinity)
-将Pod一定或尽量调度到与指定的其他Pod所在的同一节点上
+# Pod亲和性
+Pod亲和性(PodAffinity)就是将Pod一定或尽量调度到与指定的其他Pod所在的同一节点上
 
 
 ## 示例
@@ -41,5 +41,5 @@ spec:
 ```
 
 
-# Pod反亲和性(PodAntiAffinity)
-将Pod一定或尽量不要调度到与指定的其他Pod所在的同一节点上
+# Pod反亲和性
+Pod反亲和性(PodAntiAffinity)就是将Pod一定或尽量不要调度到与指定的其他Pod所在的同一节点上
