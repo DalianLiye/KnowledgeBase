@@ -1,0 +1,42 @@
+Hive 是建立在 Hadoop 之上的数据仓库工具，底层不存储数据，数据存 HDFS，元数据存 Metastore
+
+==========================主要组件=============================
+- 用户接口 Client
+  CLI (hive 命令行)、JDBC/ODBC、WebUI，接收用户 HQL 语句
+
+- Driver 驱动模块
+  Compiler 编译器：解析、语法分析、生成抽象语法树，编译生成逻辑执行计划
+  Optimizer 优化器：对逻辑计划优化，生成优化后的逻辑计划
+  Executor 执行器：把逻辑计划转为 MapReduce/Tez/Spark 任务，提交给计算引擎执行
+
+- Metastore元数据服务
+  存储库、表、分区、字段、表存储格式、数据存储路径等元信息。
+
+- Hadoop 底层存储 & 计算
+  存储：HDFS 存真实业务数据
+  计算：MapReduce/Spark/Tez执行 HQL 翻译后的任务
+
+一句话流程：写 HQL → Driver 编译优化 → Metastore 查元数据 → 提交引擎运算 → 读写 HDFS 数据返回结果
+
+- 内部表、外部表区别，删除表行为差异
+  内部表 (管理表 MANAGED_TABLE)：Hive 全权管理表的数据和元数据。
+  外部表 (EXTERNAL_TABLE)：Hive 只管理元数据，原始数据由用户自己管理
+  
+  
+- 分区数是不是越多越好
+不是。分区过多会产生大量小文件，给NameNode造成压力
+
+
+- order by /sort by /distribute by /cluster by
+
+order by
+  全局排序，整个结果集只有1个reduce 任务
+sort by
+  局部排序，每个reduce内部有序，全局不一定有序
+distribute by
+  id 相同的记录，会被发送到同一个 reduce；
+  reduce 内部数据是乱序，不会自动排序；
+  经常和 sort by 组合使用：先分发，再在每个 reduce 内部排序
+cluster by
+  同一个字段，既做分发，又做 reduce 内排序
+  只能升序，不能指定asc/desc，如果需要降序，不能用cluster by，手动写 distribute by + sort by des

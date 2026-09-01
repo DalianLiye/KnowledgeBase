@@ -1,0 +1,1 @@
+yarn cluster模式下，am进程其实就是driver进程

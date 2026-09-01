@@ -1,0 +1,198 @@
+YARN是资源调度框架，核心组件RM、NM、AM、Container
+RM全局总管，NM管理单机，AM代表单个应用去申请资源，Container是CPU内存容器
+调度器生产大多用Capacity容量调度器，用队列做资源隔离
+Container内存超出分配值会被NM杀死
+yarn‑cluster生产用，Driver跑在AM容器，client只用来调试
+YARN只管资源分配，不做shuffle、聚合等业务计算
+
+yarn只是资源调度框架，不做业务计算，只管理 CPU、内存、Container
+
+====================================基础架构类===================================
+
+- YARN 的组件有哪些？各自作用？
+ResourceManager (RM)：
+	全局资源管理器
+	接收客户端提交任务
+	管理 NodeManager
+	分配资源
+	管理Application
+
+NodeManager (NM)：
+	每台机器上的节点代理
+	管理本机资源
+	启动/销毁Container
+	监控容器资源（内存 CPU）
+	上报状态给RM。
+
+ApplicationMaster (AM)：
+	每个应用程序独有
+	向 RM 申请 Container 资源
+	跟 NM 通信启动 Executor 容器
+	监控本应用任务运行状态
+	失败重试
+
+Container
+   YARN 资源抽象，CPU + 内存的容器，所有任务都跑在 Container 里面（AM 本身也运行在 Container）。
+
+面试关键点：RM 管全局，AM 管单个应用，NM 管单机，Container 是资源载体
+
+
+- YARN Client 做什么？
+客户端，提交任务，跟RM通信，提交描述文件，不参与运行
+
+- Spark on YARN中ApplicationMaster和Driver的区别？
+AM：YARN层面组件，负责申请 Container、管理 Executor 生命周期；
+Driver：Spark框架组件，解析代码、构建DAG、切Stage、调度Task。
+yarn‑cluster：Driver运行在AM的同一个Container
+yarn‑client：Driver 跑在提交机器，AM单独容器。二者不是同一个进程。
+
+
+==================================YARN 完整任务提交流程（口述题，非常高频）======================
+Client 向 RM 提交应用；
+RM 分配一个 Container，在某台 NM 上启动 ApplicationMaster；
+AM 向 RM 注册，向 RM 申请需要的 Container 资源；
+RM 返回资源分配，AM 通知对应 NodeManager 启动 Executor Container；
+Executor 向 AM 注册，开始执行 Task；
+任务运行完成，AM 向 RM 注销，释放全部 Container 资源。
+
+
+===================================调度器相关=============================================
+- YARN 三种调度器 FIFO、Capacity、FairScheduler 区别，生产一般用哪个？
+FIFO：先进先出，简单，大任务会阻塞后面所有任务，生产不用。
+Capacity（容量调度器，CDH 默认）：划分多个队列，每个队列分配一定资源容量；队列内部 FIFO；支持多租户，企业最常用。
+FairScheduler（公平调度器）：资源公平共享，任务尽量均分资源；适合交互式、多用户并发场景。
+大部分公司生产使用 Capacity 容量调度器。
+
+- 队列 Queue 的作用？
+资源隔离，不同业务、不同团队放到不同队列，限制每个队列最大最小资源，防止一个任务吃光集群全部资源。
+
+- 队列的 capacity、maximum‑capacity 含义？
+capacity：队列最小保证资源占比；
+maximum‑capacity：队列能够使用的资源上限
+
+
+==============================Container 内存，OOM，杀死容器==============================================
+- Container 什么时候会被 NodeManager 杀掉？
+两种内存检查：物理内存、虚拟内存
+
+- 物理内存超限
+Container 实际使用物理内存超过yarn.nodemanager.resource.memory‑mb分配的内存，NM 直接 kill 容器，报Container is running beyond physical memory limits。
+
+- 虚拟内存超限：实际虚拟内存超过分配值，同样被kill
+注意：分配给 Container 的内存 ≠ executor‑memory。Executor 内存之外还有堆外、spark 的 overhead。
+
+- spark.executor.memory 和 spark.executor.memoryOverhead 关系，YARN 侧容器总内存怎么算？
+YARN给Executor Container 分配总内存 = executor‑memory + memoryOverhead
+overhead 是堆外内存，用于 JVM 堆外、native 内存，默认是 executor 内存的 10%。
+容器超过这个总和，NM 直接杀掉 Container。
+
+- yarn.nodemanager.resource.memory‑mb 是什么？
+单台机器NM能提供给所有 Container的总物理内存，不能大于机器实际物理内存。
+
+- yarn.scheduler.maximum‑allocation‑mb 作用？
+单个Container最大可申请内存。如果任务申请内存超过该值，申请不到资源。
+ 
+- AM内存参数：spark.yarn.am.memory vs spark.driver.memory
+yarn‑client 模式：AM 使用spark.yarn.am.memory；Driver 跑本地不受这个控制。
+yarn‑cluster 模式：Driver 运行在 AM 容器，使用spark.driver.memory作为 AM 容器内存。
+
+
+=====================================运行模式、故障类=================================
+- yarn‑client 和 yarn‑cluster 模式区别，生产选哪个？
+yarn‑cluster：Driver 运行在 AM 容器集群内部。提交机器断开不影响任务；生产环境使用。
+yarn‑client：Driver 运行在提交任务的客户端机器。客户端断网、进程退出，整个作业失败；仅用于本地调试。
+
+- AM 挂掉会发生什么？可以重试吗？
+AM崩溃，整个Application失败
+YARN支持AM重试，参数yarn.resourcemanager.am.max‑retries，重试次数耗尽，应用标记失败。
+
+- Executor是RM启动的吗？
+不是。RM只做资源分配
+AM收到资源分配后，通知NodeManager启动Executor Container。
+
+- YARN的日志存在哪里？怎么看任务日志？
+日志存在各个NodeManager机器磁盘
+可以通过YARN WebUI查看容器日志
+生产一般聚合日志到HDFS
+
+- YARN报资源不足，可能有哪些原因？
+集群整体资源耗尽
+队列max资源限制
+单任务申请内存超过maximum‑allocation‑mb；
+大量僵尸Container没有释放；
+机器NM宕机，可用节点变少。
+
+- YARN中Container有哪些状态？
+NEW → ALLOCATED → RUNNING → COMPLETED/KILLED/FAILED
+
+
+
+
+
+
+问：Executor 被 NM 杀掉，怎么排查？
+看YARN容器日志，看报错是物理内存超限，还是GC，还是磁盘满
+区分是业务数据太大，还是overhead设置太小
+
+
+问：YARN可以调度CPU吗？
+可以，支持内存 + CPU 两种资源调度
+
+
+问：Application ID 格式含义？
+application_\({时间戳}_\){序号}
+
+
+问：RM HA 高可用怎么做？
+RM 主备切换，Zookeeper存储状态，主 RM 挂掉后备 RM 接管
+
+
+
+
+
+
+
+1) YARN三大组件：ResourceManager、NodeManager、ApplicationMaster各自职责
+- ResourceManager: 
+  整个集群的资源总管理者：统一管理集群所有节点的 CPU、内存资源。
+  Scheduler（调度器）：接收资源请求，分配容器 Container 资源，不监控应用运行状态
+  ApplicationManager：接收作业提交，启动对应 ApplicationMaster；监控 AM 生命周期；处理应用完成 / 失败。
+  对外接收客户端提交任务请求，管控整个集群，单点（可 HA 高可用）
+
+- NodeManager: 
+  单机资源管家：管理本机的 CPU、内存，向 RM 定时汇报本机资源使用情况。
+  接收 RM / AM 的指令，启动、停止 Container（Container 是 YARN 资源抽象，运行任务进程）。
+  监控本机各个 Container 进程运行状态，日志收集，资源隔离。
+  心跳上报给 ResourceManager
+  
+- ApplicationMaster
+  向ResourceManager为本应用申请所需 Container 资源
+  拿到资源后，和 NodeManager 通信，要求 NM 启动 Container 执行具体任务
+  监控本应用下所有任务的运行，处理任务失败重试
+  任务全部结束后，向RM注销自己，释放资源
+  
+  
+2) Spark‑on‑YARN：yarn‑client vs yarn‑cluster
+  核心本质区别：Spark Driver 进程运行在哪里
+  yarn‑client：Driver 跑在提交任务的客户端机器
+  yarn‑cluster：Driver 也跑在 YARN 集群的 Container 里面（集群某台NodeManager节点）
+  
+ 
+3) Driver 和 ApplicationMaster (AM) 区别
+   ApplicationMaster是yarn的组件，driver是spark组件
+   am：向ResourceManager 申请 Container；跟 NodeManager 通信启动容器；向 YARN 汇报应用状态
+   driver：解析代码、生成 DAG、划分 Stage、生成 Task；调度 Task 下发给 Executor；收集结果；维护 SparkContext
+   
+4) YARN 的资源调度器：FIFO、Capacity、FairScheduler 区别，公司一般用哪个？
+   FIFO 先进先出调度器
+     作业按提交顺序排队，先来先服务。整个集群是一个大队列
+   CapacityScheduler
+     容量调度器（国内公司主流默认）:划分多个队列，给每个队列分配固定资源容量，队列内部作业依旧是FIFO，也可以开启队列内公平，队列空闲资源，可以借给其他繁忙队列；本队列有任务到来时，会回收借来的资源
+   FairScheduler
+     公平调度器: 资源尽可能公平分配，而不是固定配额
+   
+5) YARN 中 Container 是什么？Container 内存超了会发生什么（物理内存、虚拟内存）
+   Container 是 YARN 的资源抽象单元，不是 Docker 容器，是 YARN 对 CPU、内存资源的封装
+   超了内存会报143错误
+   
+6) AM的工作流程，AM怎么启动Executor？

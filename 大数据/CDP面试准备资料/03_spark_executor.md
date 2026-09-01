@@ -1,0 +1,18 @@
+# Executor
+YARN‑Cluster模式下，yarn的ResourceManager分配Container（资源容器，仅提供 CPU、内存资源，不是进程）
+Container里面启动Executor JVM 进程
+一个 Container对应一个Executor进程
+
+Executor属于Application级别：一个Spark应用，会启动若干个Executor
+应用结束，所有Executor全部销毁释放资源
+
+Executor内部是多线程模型：
+- 用线程执行Task，1个线程执行1个Task
+- 一个Executor可以并发跑多个Task
+
+Executor不理解DAG、Stage，只接收Driver下发的Task对象，执行ShuffleMapTask/ResultTask
+
+一个Executor进程，只属于某一个YARN Application，只能跑这个Application的Task
+executor是YARN为某一个application_xxxx专门启动的Container内部进程
+Executor和Application是一对一绑定
+Application A的Executor，只接收A的Driver下发的Task，永远不会接收Application‑B Driver 的任务
